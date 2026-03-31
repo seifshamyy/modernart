@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Art · CMS Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <style>
+  :root {
+    --dw: #1A110B; --oud: #2C1810; --hn: #4A2820; --dg: #C49A5C; --iv: #F5EDD8;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--dw); color: var(--iv); font-family: 'Tajawal', sans-serif; min-height: 100vh; }
+  button { border: none; cursor: pointer; font-family: inherit; }
+  input, textarea { width: 100%; font-family: inherit; background: rgba(255,255,255,0.03); border: 1px solid rgba(196,154,92,0.2); color: var(--iv); padding: 0.8rem 1rem; border-radius: 4px; outline: none; transition: border-color 0.3s; }
+  input:focus, textarea:focus { border-color: var(--dg); }
+  
+  /* Views */
+  .view { display: none; padding: 3rem 2rem; max-width: 1200px; margin: 0 auto; }
+  .view.active { display: block; animation: fadeIn 0.4s var(--ease); }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  /* Login */
+  #login-view { max-width: 400px; margin-top: 10vh; text-align: center; }
+  .l-logo { width: 120px; margin: 0 auto 2rem; }
+  .btn-primary { background: var(--dg); color: var(--dw); padding: 0.8rem 2rem; font-weight: 600; border-radius: 4px; transition: opacity 0.3s; width: 100%; margin-top: 1rem; }
+  .btn-primary:hover { opacity: 0.9; }
+
+  /* Dashboard Header */
+  .dash-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(196,154,92,0.15); padding-bottom: 1.5rem; margin-bottom: 2rem; }
+  .dash-title { font-family: 'Reem Kufi', sans-serif; font-size: 2rem; color: var(--dg); }
+  .btn-outline { background: transparent; border: 1px solid var(--dg); color: var(--dg); padding: 0.6rem 1.5rem; border-radius: 4px; font-weight: 500; transition: all 0.3s; }
+  .btn-outline:hover { background: var(--dg); color: var(--dw); }
+
+  /* DB Grid */
+  .p-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+  .p-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(196,154,92,0.1); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; }
+  .p-card img { width: 100%; height: 180px; object-fit: cover; }
+  .p-card-body { padding: 1.2rem; flex: 1; display:flex; flex-direction: column;}
+  .p-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.3rem; }
+  .p-slug { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 1rem; }
+  .p-actions { display: flex; gap: 0.5rem; margin-top: auto; }
+  .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.85rem; border-radius: 3px; cursor: pointer; }
+  .btn-edit { background: rgba(196,154,92,0.15); color: var(--dg); border: 1px solid var(--dg); }
+  .btn-del { background: rgba(220,53,69,0.15); color: #ff6b6b; border: 1px solid #ff6b6b; }
+
+  /* Editor Mode */
+  .ed-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
+  @media(max-width:768px){ 
+    .ed-grid{grid-template-columns: 1fr; gap: 1.2rem;} 
+    .ed-panel{padding: 1.5rem 1rem;}
+    .dash-header{flex-direction: column; gap: 1rem; text-align: center;}
+    .view{padding: 1.5rem 1rem;}
+    div[style*="flex:1; border-left:1px solid"] { border-left:none !important; padding-left:0 !important; margin-bottom:2rem; border-bottom:1px solid rgba(196,154,92,0.1); padding-bottom:1.5rem; }
+    div[style*="display:flex;gap:1.5rem;"] { flex-direction:column; gap:0 !important; }
+  }
+  .ed-panel { background: rgba(255,255,255,0.02); border: 1px solid rgba(196,154,92,0.1); padding: 2rem; border-radius: 6px; }
+  .form-group { margin-bottom: 1.2rem; }
+  .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+  
+  /* Uploaders */
+  .upload-box { border: 2px dashed rgba(196,154,92,0.3); background: rgba(0,0,0,0.2); padding: 1.5rem; text-align: center; border-radius: 6px; position: relative; cursor: pointer; transition: border-color 0.3s; }
+  .upload-box:hover { border-color: var(--dg); }
+  .upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width:100%; }
+  .upload-status { font-size: 0.85rem; color: var(--dg); margin-top: 0.5rem; display:none;}
+  .img-preview-group { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:1rem; }
+  .img-preview-group img { width:80px; height:80px; object-fit:cover; border-radius:4px; border:1px solid var(--dg);}
+
+  .loading-overlay { position:fixed; inset:0; background:rgba(26,17,11,0.9); z-index:999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:1rem; display:none; }
+  .loading-overlay.active { display:flex; }
+  .spinner { width:40px;height:40px;border:3px solid rgba(196,154,92,0.2); border-top-color:var(--dg); border-radius:50%; animation:spin 1s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  
+  .error-msg { color: #ff6b6b; font-size: 0.9rem; text-align: center; margin-top: 1rem; display: none; }
+  </style>
+</head>
+<body>
+
+<!-- Loading State -->
+<div class="loading-overlay" id="loader">
+  <div class="spinner"></div>
+  <p id="loader-text" style="color:var(--dg);font-weight:500;letter-spacing:1px;">جاري المعالجة...</p>
+</div>
+
+<!-- Login View -->
+<div id="login-view" class="view active">
+  <img src="https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/darklinesontransparentbg.png" alt="Logo" class="l-logo" style="filter: brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(10deg);">
+  <h2 style="font-family:'Reem Kufi',sans-serif;color:var(--dg);margin-bottom:1.5rem;">مدير المحتوى</h2>
+  <div class="form-group">
+    <input type="password" id="pw-input" placeholder="أدخل كلمة المرور" onkeypress="if(event.key==='Enter') login()">
+  </div>
+  <button class="btn-primary" onclick="login()">دخول</button>
+  <p class="error-msg" id="login-err">كلمة المرور غير صحيحة</p>
+</div>
+
+<!-- Dashboard View -->
+<div id="dash-view" class="view">
+  <div class="dash-header">
+    <h2 class="dash-title">إدارة الأعمال (Portfolio)</h2>
+    <div style="display:flex;gap:1rem;">
+      <button class="btn-outline" onclick="openEditor()">+ إضافة مشروع جديد</button>
+      <button class="btn-outline" onclick="logout()" style="border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.5)">تسجيل الخروج</button>
+    </div>
+  </div>
+  <div class="p-grid" id="projects-grid">
+    <!-- Rendered via JS -->
+  </div>
+</div>
+
+<!-- Editor View -->
+<div id="editor-view" class="view">
+  <div class="dash-header">
+    <h2 class="dash-title" id="ed-title-head">إضافة مشروع</h2>
+    <button class="btn-outline" onclick="showDash()">← العودة</button>
+  </div>
+  
+  <form id="project-form" onsubmit="saveProject(event)">
+    <input type="hidden" id="f-id">
+    
+    <div class="ed-grid">
+      <!-- Main Content -->
+      <div class="ed-panel">
+        <div class="form-group">
+          <label>المعرف (Slug) - إنجليزي بدون مسافات، يفضل أن يكون فريداً</label>
+          <input type="text" id="f-slug" required placeholder="e.g. hotel-chair-01">
+        </div>
+        <div style="display:flex;gap:1.5rem;">
+          <!-- Arabic Flow -->
+          <div style="flex:1; border-left:1px solid rgba(196,154,92,0.1); padding-left:1.5rem;">
+            <h4 style="color:var(--dg);margin-bottom:1rem;font-family:'Reem Kufi',sans-serif;">المحتوى العربي</h4>
+            <div class="form-group">
+              <label>العنوان (Title)</label>
+              <input type="text" id="f-ar" required>
+            </div>
+            <div class="form-group">
+              <label>اسم العميل / المشروع (Client)</label>
+              <input type="text" id="f-client">
+            </div>
+            <div class="form-group">
+              <label>الخامات المستخدمة (Materials)</label>
+              <input type="text" id="f-materials">
+            </div>
+            <div class="form-group">
+              <label>تحدي المشروع (Challenge)</label>
+              <textarea id="f-challenge" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label>النتيجة والحل (Solution)</label>
+              <textarea id="f-solution" rows="3"></textarea>
+            </div>
+          </div>
+
+          <!-- English Flow -->
+          <div style="flex:1" dir="ltr">
+            <h4 style="color:var(--dg);margin-bottom:1rem;font-family:'Reem Kufi',sans-serif;text-align:left;">English Content</h4>
+            <div class="form-group">
+              <label style="text-align:left;">Title</label>
+              <input type="text" id="f-en" required>
+            </div>
+            <div class="form-group">
+              <label style="text-align:left;">Client / Project Name</label>
+              <input type="text" id="f-client-en">
+            </div>
+            <div class="form-group">
+              <label style="text-align:left;">Materials Used</label>
+              <input type="text" id="f-materials-en">
+            </div>
+            <div class="form-group">
+              <label style="text-align:left;">The Challenge</label>
+              <textarea id="f-challenge-en" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label style="text-align:left;">The Solution</label>
+              <textarea id="f-solution-en" rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Media Panel -->
+      <div class="ed-panel">
+        <div class="form-group">
+          <label>الصورة الرئيسية (Thumbnail)</label>
+          <div class="upload-box">
+            <span style="color:var(--dg)">اسحب أو اضغط للرفع</span>
+            <input type="file" id="u-thumb" accept="image/*" onchange="uploadSingleFile(this, 'thumb')">
+            <p class="upload-status" id="st-thumb">جاري الرفع...</p>
+          </div>
+          <input type="hidden" id="f-thumb-url" required>
+          <div class="img-preview-group" id="pv-thumb"></div>
+        </div>
+        
+        <div class="form-group" style="margin-top:2rem;">
+          <label>معرض الصور الإضافية (Gallery)</label>
+          <div class="upload-box">
+            <span style="color:var(--dg)">اسحب أو اضغط لرفع صورة إضافية</span>
+            <input type="file" id="u-gallery" accept="image/*" onchange="uploadSingleFile(this, 'gallery')">
+            <p class="upload-status" id="st-gallery">جاري الرفع...</p>
+          </div>
+          <!-- We store JSON string here for submission -->
+          <input type="hidden" id="f-gallery-urls" value="[]">
+          <div class="img-preview-group" id="pv-gallery"></div>
+        </div>
+        
+        <button type="submit" class="btn-primary" style="margin-top:2rem;width:100%;font-size:1.1rem;padding:1rem;">حفظ المشروع</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- SUPABASE JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Configurations
+const SUPA_URL = 'https://whmbrguzumyatnslzfsq.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndobWJyZ3V6dW15YXRuc2x6ZnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzNTE2ODksImV4cCI6MjA2NDkyNzY4OX0.xcSogaAHv8uQzhFgEDZ1niFx8lirLiBRvkPpMF174YM';
+
+let supaClient;
+try {
+  supaClient = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+} catch (err) {
+  console.error("Supabase Init Error:", err);
+}
+
+const WEBHOOK_URL = 'https://primary-production-9e01d.up.railway.app/webhook/be3bfcdd-adb8-4fec-b2cb-91565ce8a23c';
+
+// State
+let projects = [];
+let galleryArray = [];
+
+/* --- AUTH --- */
+function login() {
+  const pwInput = document.getElementById('pw-input');
+  if(!pwInput) return;
+  const pw = pwInput.value.trim(); // Trim spaces from pasting
+  
+  if(pw === 'modernart_fineworks**') {
+    document.getElementById('login-err').style.display='none';
+    localStorage.setItem('maCMSAuth', 'true');
+    showDash();
+  } else {
+    const errEl = document.getElementById('login-err');
+    errEl.style.display = 'block';
+    errEl.textContent = 'كلمة المرور غير صحيحة';
+    errEl.style.color = '#ff6b6b';
+  }
+}
+function logout() {
+  localStorage.removeItem('maCMSAuth');
+  switchView('login-view');
+  document.getElementById('pw-input').value='';
+}
+window.onload = () => {
+  if(localStorage.getItem('maCMSAuth') === 'true') showDash();
+}
+
+function switchView(id) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showLoading(msg="جاري المعالجة...") {
+  document.getElementById('loader-text').textContent = msg;
+  document.getElementById('loader').classList.add('active');
+}
+function hideLoading() {
+  document.getElementById('loader').classList.remove('active');
+}
+
+/* --- DASHBOARD --- */
+async function showDash() {
+  switchView('dash-view');
+  showLoading("جاري جلب البيانات...");
+  
+  if(!supaClient) {
+    hideLoading();
+    alert("هناك مشكلة في الاتصال بقاعدة البيانات. تأكد من اتصال الإنترنت.");
+    return;
+  }
+  
+  const { data, error } = await supaClient
+    .from('portfolio_projects')
+    .select('*')
+    .order('created_at', { ascending: false });
+    
+  hideLoading();
+  
+  if(error) { alert("Error fetching data: " + error.message); return; }
+  projects = data || [];
+  renderGrid();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('projects-grid');
+  grid.innerHTML = projects.map(p => `
+    <div class="p-card">
+      <img src="${p.thumb}" alt="thumb">
+      <div class="p-card-body">
+        <h3 class="p-title">${p.title_ar}</h3>
+        <p class="p-slug">${p.slug}</p>
+        <div class="p-actions">
+          <button class="btn-sm btn-edit" onclick="editProject('${p.id}')">تعديل</button>
+          <button class="btn-sm btn-del" onclick="deleteProject('${p.id}')">حذف</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* --- EDITOR --- */
+function openEditor() {
+  document.getElementById('project-form').reset();
+  document.getElementById('f-id').value = '';
+  document.getElementById('f-thumb-url').value = '';
+  document.getElementById('pv-thumb').innerHTML = '';
+  
+  galleryArray = [];
+  updateGalleryInput();
+  
+  document.getElementById('ed-title-head').textContent = "إضافة مشروع جديد";
+  switchView('editor-view');
+}
+
+function editProject(id) {
+  const p = projects.find(x => x.id === id);
+  if(!p) return;
+  
+  document.getElementById('f-id').value = p.id;
+  document.getElementById('f-slug').value = p.slug;
+  document.getElementById('f-ar').value = p.title_ar;
+  document.getElementById('f-en').value = p.title_en;
+  
+  document.getElementById('f-client').value = p.client || "";
+  document.getElementById('f-materials').value = p.materials || "";
+  document.getElementById('f-challenge').value = p.challenge || "";
+  document.getElementById('f-solution').value = p.solution || "";
+
+  document.getElementById('f-client-en').value = p.client_en || "";
+  document.getElementById('f-materials-en').value = p.materials_en || "";
+  document.getElementById('f-challenge-en').value = p.challenge_en || "";
+  document.getElementById('f-solution-en').value = p.solution_en || "";
+  
+  document.getElementById('f-thumb-url').value = p.thumb;
+  document.getElementById('pv-thumb').innerHTML = `<img src="${p.thumb}">`;
+  
+  galleryArray = p.images || [];
+  updateGalleryInput();
+  
+  document.getElementById('ed-title-head').textContent = "تعديل المشروع";
+  switchView('editor-view');
+}
+
+async function saveProject(e) {
+  e.preventDefault();
+  
+  const payload = {
+    slug: document.getElementById('f-slug').value.trim(),
+    title_ar: document.getElementById('f-ar').value.trim(),
+    title_en: document.getElementById('f-en').value.trim(),
+    
+    client: document.getElementById('f-client').value.trim(),
+    materials: document.getElementById('f-materials').value.trim(),
+    challenge: document.getElementById('f-challenge').value.trim(),
+    solution: document.getElementById('f-solution').value.trim(),
+
+    client_en: document.getElementById('f-client-en').value.trim(),
+    materials_en: document.getElementById('f-materials-en').value.trim(),
+    challenge_en: document.getElementById('f-challenge-en').value.trim(),
+    solution_en: document.getElementById('f-solution-en').value.trim(),
+    
+    thumb: document.getElementById('f-thumb-url').value,
+    images: galleryArray
+  };
+  
+  const id = document.getElementById('f-id').value;
+  showLoading(id ? "جاري التحديث..." : "جاري الإضافة...");
+  
+  if(id) {
+    const { error } = await supaClient.from('portfolio_projects').update(payload).eq('id', id);
+    if(error) alert("Error: " + error.message);
+  } else {
+    const { error } = await supaClient.from('portfolio_projects').insert([payload]);
+    if(error) alert("Error: " + error.message);
+  }
+  
+  hideLoading();
+  showDash();
+}
+
+async function deleteProject(id) {
+  if(!confirm("هل أنت متأكد من حذف هذا المشروع نهائياً؟")) return;
+  
+  showLoading("جاري الحذف...");
+  const { error } = await supaClient.from('portfolio_projects').delete().eq('id', id);
+  hideLoading();
+  
+  if(error) alert("Error: " + error.message);
+  else showDash();
+}
+
+/* --- UPLOADER (Railway Webhook) --- */
+async function uploadSingleFile(inputEl, type) {
+  if(!inputEl.files || !inputEl.files[0]) return;
+  const file = inputEl.files[0];
+  
+  const stEl = document.getElementById(type === 'thumb' ? 'st-thumb' : 'st-gallery');
+  stEl.style.display = 'block';
+  stEl.textContent = 'جاري الرفع...';
+  stEl.style.color = 'var(--dg)';
+  
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('filename', file.name);
+    
+    // Hit Railway webhook
+    const res = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      body: fd
+    });
+    
+    if(!res.ok) throw new Error("Upload Failed");
+    
+    // User noted webhook returns {"link":"r2linkhere"}
+    const json = await res.json();
+    const finalUrl = json.link;
+    
+    if(!finalUrl) throw new Error("Webhook did not return a valid link property.");
+    
+    // Handle UI placement
+    if(type === 'thumb') {
+      document.getElementById('f-thumb-url').value = finalUrl;
+      document.getElementById('pv-thumb').innerHTML = `<img src="${finalUrl}">`;
+    } else {
+      galleryArray.push(finalUrl);
+      updateGalleryInput();
+    }
+    
+    stEl.textContent = 'تم الرفع بنجاح ✓';
+    stEl.style.color = '#4CAF50';
+    setTimeout(()=> stEl.style.display='none', 3000);
+    
+  } catch(err) {
+    stEl.textContent = 'فشل الرفع!';
+    stEl.style.color = '#ff6b6b';
+    console.error(err);
+  }
+  
+  // Clear file input so same file can be selected again if needed
+  inputEl.value = '';
+}
+
+function updateGalleryInput() {
+  document.getElementById('f-gallery-urls').value = JSON.stringify(galleryArray);
+  const pv = document.getElementById('pv-gallery');
+  pv.innerHTML = galleryArray.map((url, i) => `
+    <div style="position:relative">
+      <img src="${url}">
+      <button type="button" onclick="removeGalleryImg(${i})" style="position:absolute;top:-5px;right:-5px;background:red;color:white;width:20px;height:20px;border-radius:50%;font-size:10px;">✕</button>
+    </div>
+  `).join('');
+}
+function removeGalleryImg(index) {
+  galleryArray.splice(index, 1);
+  updateGalleryInput();
+}
+</script>
+</body>
+</html>
