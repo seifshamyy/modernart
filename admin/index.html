@@ -34,8 +34,24 @@
   .btn-outline { background: transparent; border: 1px solid var(--dg); color: var(--dg); padding: 0.6rem 1.5rem; border-radius: 4px; font-weight: 500; transition: all 0.3s; }
   .btn-outline:hover { background: var(--dg); color: var(--dw); }
 
-  /* DB Grid */
-  .p-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+  /* Tab nav */
+  .tab-nav{display:flex;gap:.75rem;margin-bottom:2rem;border-bottom:1px solid rgba(196,154,92,0.1);padding-bottom:1rem;}
+  .tab-btn{background:transparent;color:rgba(255,255,255,.45);font-family:'Tajawal',sans-serif;font-size:.9rem;padding:.5rem 1.2rem;border:1px solid transparent;border-radius:3px;cursor:pointer;transition:all .3s;}
+  .tab-btn.active{background:rgba(196,154,92,.12);border-color:rgba(196,154,92,.3);color:var(--dg);}
+  /* Expertise grid */
+  .svc-mgr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.2rem;}
+  .svc-mgr-card{background:rgba(255,255,255,.02);border:1px solid rgba(196,154,92,.1);border-radius:6px;overflow:hidden;}
+  .svc-mgr-img{width:100%;height:140px;object-fit:cover;display:block;}
+  .svc-mgr-body{padding:1rem;}
+  .svc-mgr-title{font-size:1rem;font-weight:600;color:var(--iv);margin-bottom:.2rem;}
+  .svc-mgr-sub{font-size:.78rem;color:rgba(255,255,255,.4);margin-bottom:.8rem;}
+  /* Expertise modal */
+  #exp-modal-ov{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:1.5rem;}
+  #exp-modal-ov.open{display:flex;}
+  #exp-modal{background:var(--oud);border:1px solid rgba(196,154,92,.2);border-top:2px solid var(--dg);padding:2rem;border-radius:6px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;position:relative;}
+  #exp-modal h3{font-family:'Reem Kufi',sans-serif;color:var(--dg);margin-bottom:1.5rem;font-size:1.2rem;}
+  .em-close{position:absolute;top:1rem;left:1rem;background:transparent;border:1px solid rgba(196,154,92,.2);color:rgba(255,255,255,.5);width:28px;height:28px;border-radius:2px;cursor:pointer;font-size:.8rem;}
+  .exp-img-preview{width:100%;height:140px;object-fit:cover;border-radius:4px;border:1px solid rgba(196,154,92,.2);margin-bottom:.8rem;display:none;}
   .p-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(196,154,92,0.1); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; }
   .p-card img { width: 100%; height: 180px; object-fit: cover; }
   .p-card-body { padding: 1.2rem; flex: 1; display:flex; flex-direction: column;}
@@ -98,14 +114,31 @@
 <!-- Dashboard View -->
 <div id="dash-view" class="view">
   <div class="dash-header">
-    <h2 class="dash-title">إدارة الأعمال (Portfolio)</h2>
+    <h2 class="dash-title">لوحة التحكم · CMS</h2>
     <div style="display:flex;gap:1rem;">
-      <button class="btn-outline" onclick="openEditor()">+ إضافة مشروع جديد</button>
+      <button class="btn-outline" id="btn-add-project" onclick="openEditor()">+ مشروع جديد</button>
       <button class="btn-outline" onclick="logout()" style="border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.5)">تسجيل الخروج</button>
     </div>
   </div>
-  <div class="p-grid" id="projects-grid">
-    <!-- Rendered via JS -->
+
+  <!-- Tab navigation -->
+  <div class="tab-nav">
+    <button class="tab-btn active" id="tab-portfolio" onclick="switchTab('portfolio')">Portfolio</button>
+    <button class="tab-btn" id="tab-expertise" onclick="switchTab('expertise')">Expertise Services</button>
+  </div>
+
+  <!-- Portfolio tab -->
+  <div id="pane-portfolio">
+    <div class="p-grid" id="projects-grid">
+      <!-- Rendered via JS -->
+    </div>
+  </div>
+
+  <!-- Expertise tab -->
+  <div id="pane-expertise" style="display:none;">
+    <div class="svc-mgr-grid" id="expertise-grid">
+      <!-- Rendered via JS -->
+    </div>
   </div>
 </div>
 
@@ -201,13 +234,73 @@
           </div>
           <!-- We store JSON string here for submission -->
           <input type="hidden" id="f-gallery-urls" value="[]">
-          <div class="img-preview-group" id="pv-gallery"></div>
+      <div class="img-preview-group" id="pv-gallery"></div>
         </div>
         
         <button type="submit" class="btn-primary" style="margin-top:2rem;width:100%;font-size:1.1rem;padding:1rem;">حفظ المشروع</button>
       </div>
     </div>
   </form>
+</div>
+
+<!-- ============================================================
+     EXPERTISE EDITOR MODAL
+============================================================ -->
+<div id="exp-modal-ov">
+  <div id="exp-modal">
+    <button class="em-close" onclick="closeExpModal()">✕</button>
+    <h3 id="exp-modal-title">تعديل الخدمة · Edit Service</h3>
+    <input type="hidden" id="exp-id">
+
+    <div style="display:flex;gap:1.5rem;margin-bottom:1rem;">
+      <!-- English fields -->
+      <div style="flex:1;" dir="ltr">
+        <h4 style="color:var(--dg);margin-bottom:1rem;font-size:.85rem;letter-spacing:.1em;">ENGLISH</h4>
+        <div class="form-group">
+          <label style="text-align:left;">Title (EN)</label>
+          <input type="text" id="exp-title">
+        </div>
+        <div class="form-group">
+          <label style="text-align:left;">Subtitle / Tagline (EN)</label>
+          <input type="text" id="exp-subtitle">
+        </div>
+        <div class="form-group">
+          <label style="text-align:left;">Description (EN)</label>
+          <textarea id="exp-desc" rows="4"></textarea>
+        </div>
+      </div>
+      <!-- Arabic fields -->
+      <div style="flex:1;border-right:1px solid rgba(196,154,92,.1);padding-right:1.5rem;" dir="rtl">
+        <h4 style="color:var(--dg);margin-bottom:1rem;font-family:'Reem Kufi',sans-serif;font-size:.9rem;">عربي</h4>
+        <div class="form-group">
+          <label>العنوان (AR)</label>
+          <input type="text" id="exp-title-ar">
+        </div>
+        <div class="form-group">
+          <label>التسمية الفرعية (AR)</label>
+          <input type="text" id="exp-subtitle-ar">
+        </div>
+        <div class="form-group">
+          <label>الوصف (AR)</label>
+          <textarea id="exp-desc-ar" rows="4"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shared image upload -->
+    <div class="form-group" dir="rtl">
+      <label>صورة الخدمة · Service Image</label>
+      <img class="exp-img-preview" id="exp-img-preview" src="" alt="Preview">
+      <div class="upload-box">
+        <span style="color:var(--dg)">اسحب أو اضغط للرفع</span>
+        <input type="file" id="exp-img-file" accept="image/*" onchange="uploadExpImage(this)">
+        <p class="upload-status" id="exp-img-status">جاري الرفع...</p>
+      </div>
+      <input type="hidden" id="exp-img-url">
+    </div>
+
+    <button class="btn-primary" onclick="saveExpertise()" style="width:100%;margin-top:1rem;">حفظ · Save</button>
+  </div>
 </div>
 
 <!-- SUPABASE JS -->
@@ -465,6 +558,132 @@ function updateGalleryInput() {
 function removeGalleryImg(index) {
   galleryArray.splice(index, 1);
   updateGalleryInput();
+}
+
+/* ===================================================================
+   TAB SWITCHING
+=================================================================== */
+let currentTab = 'portfolio';
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('pane-portfolio').style.display = tab === 'portfolio' ? '' : 'none';
+  document.getElementById('pane-expertise').style.display = tab === 'expertise' ? '' : 'none';
+  document.getElementById('btn-add-project').style.display = tab === 'portfolio' ? '' : 'none';
+  document.getElementById('tab-portfolio').classList.toggle('active', tab === 'portfolio');
+  document.getElementById('tab-expertise').classList.toggle('active', tab === 'expertise');
+  if (tab === 'expertise') loadExpertiseServices();
+}
+
+/* ===================================================================
+   EXPERTISE SERVICES CRUD
+=================================================================== */
+let expertiseServices = [];
+
+async function loadExpertiseServices() {
+  showLoading('جاري جلب الخدمات...');
+  const { data, error } = await supaClient
+    .from('expertise_services')
+    .select('*')
+    .order('sort_order', { ascending: true });
+  hideLoading();
+  if (error) { alert('Error: ' + error.message); return; }
+  expertiseServices = data || [];
+  renderExpertiseGrid();
+}
+
+function renderExpertiseGrid() {
+  const grid = document.getElementById('expertise-grid');
+  if (!expertiseServices.length) {
+    grid.innerHTML = '<p style="color:rgba(255,255,255,.4);padding:2rem;">لا توجد خدمات. شغّل أوامر SQL أولاً في Supabase.</p>';
+    return;
+  }
+  grid.innerHTML = expertiseServices.map(s => `
+    <div class="svc-mgr-card">
+      <img class="svc-mgr-img" src="${s.image_url || 'https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/goldenembossonleather'}" alt="${s.title}" onerror="this.style.display='none'">
+      <div class="svc-mgr-body">
+        <p class="svc-mgr-title">${s.title}</p>
+        <p class="svc-mgr-sub">${s.subtitle}</p>
+        <div class="p-actions">
+          <button class="btn-sm btn-edit" onclick="openExpEditor('${s.id}')">تعديل</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openExpEditor(id) {
+  const s = expertiseServices.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('exp-id').value = s.id;
+  document.getElementById('exp-title').value = s.title || '';
+  document.getElementById('exp-subtitle').value = s.subtitle || '';
+  document.getElementById('exp-desc').value = s.description || '';
+  document.getElementById('exp-title-ar').value = s.title_ar || '';
+  document.getElementById('exp-subtitle-ar').value = s.subtitle_ar || '';
+  document.getElementById('exp-desc-ar').value = s.description_ar || '';
+  document.getElementById('exp-img-url').value = s.image_url || '';
+  const prev = document.getElementById('exp-img-preview');
+  if (s.image_url) { prev.src = s.image_url; prev.style.display = 'block'; }
+  else { prev.style.display = 'none'; }
+  document.getElementById('exp-modal-ov').classList.add('open');
+}
+
+function closeExpModal() {
+  document.getElementById('exp-modal-ov').classList.remove('open');
+}
+
+async function saveExpertise() {
+  const id = document.getElementById('exp-id').value;
+  const payload = {
+    title:          document.getElementById('exp-title').value.trim(),
+    subtitle:       document.getElementById('exp-subtitle').value.trim(),
+    description:    document.getElementById('exp-desc').value.trim(),
+    title_ar:       document.getElementById('exp-title-ar').value.trim(),
+    subtitle_ar:    document.getElementById('exp-subtitle-ar').value.trim(),
+    description_ar: document.getElementById('exp-desc-ar').value.trim(),
+    image_url:      document.getElementById('exp-img-url').value.trim()
+  };
+  if (!payload.title && !payload.title_ar) { alert('العنوان مطلوب'); return; }
+  showLoading('جاري الحفظ...');
+  const { error } = await supaClient
+    .from('expertise_services')
+    .update(payload)
+    .eq('id', id);
+  hideLoading();
+  if (error) { alert('Error: ' + error.message); return; }
+  closeExpModal();
+  loadExpertiseServices();
+}
+
+async function uploadExpImage(inputEl) {
+  if (!inputEl.files || !inputEl.files[0]) return;
+  const file = inputEl.files[0];
+  const stEl = document.getElementById('exp-img-status');
+  stEl.style.display = 'block';
+  stEl.textContent = 'جاري الرفع...';
+  stEl.style.color = 'var(--dg)';
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('filename', file.name);
+    const res = await fetch(WEBHOOK_URL, { method: 'POST', body: fd });
+    if (!res.ok) throw new Error('Upload Failed');
+    const json = await res.json();
+    const finalUrl = json.link;
+    if (!finalUrl) throw new Error('No link returned');
+    document.getElementById('exp-img-url').value = finalUrl;
+    const prev = document.getElementById('exp-img-preview');
+    prev.src = finalUrl;
+    prev.style.display = 'block';
+    stEl.textContent = 'تم الرفع بنجاح ✓';
+    stEl.style.color = '#4CAF50';
+    setTimeout(() => stEl.style.display = 'none', 3000);
+  } catch(err) {
+    stEl.textContent = 'فشل الرفع!';
+    stEl.style.color = '#ff6b6b';
+    console.error(err);
+  }
+  inputEl.value = '';
 }
 </script>
 </body>

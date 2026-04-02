@@ -201,18 +201,79 @@
      SERVICES
   ================================================================= */
   #services{padding:9rem 0;background:var(--oud);position:relative}
-  .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);margin-top:3.5rem;border:1px solid rgba(74,40,32,.5)}
-  .svc-card{padding:2.8rem 2.2rem;border-left:1px solid rgba(74,40,32,.5);border-bottom:1px solid rgba(74,40,32,.5);position:relative;overflow:hidden;transition:background .5s var(--ease)}
-  .svc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--dg);transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease)}
-  .svc-card:hover{background:rgba(26,17,11,.7)}
+  .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);margin-top:3.5rem;gap:1.5rem;}
+
+  /* --- Image-backed card --- */
+  .svc-card{
+    position:relative;overflow:hidden;
+    height:340px;
+    border:1px solid rgba(74,40,32,.45);
+    cursor:pointer;
+    transition:transform .55s var(--ease),box-shadow .55s var(--ease),border-color .4s;
+  }
+  .svc-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 28px 70px rgba(0,0,0,.55);
+    border-color:rgba(196,154,92,.4);
+  }
+  /* Background image */
+  .svc-bg-img{
+    position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;
+    transition:transform 1.2s var(--ease),filter 0.6s;
+    filter:sepia(.15) saturate(1.05) brightness(.55);
+  }
+  .svc-card:hover .svc-bg-img{transform:scale(1.06);filter:sepia(.1) saturate(1.1) brightness(.65);}
+  /* Dark gradient overlay */
+  .svc-overlay{
+    position:absolute;inset:0;
+    background:linear-gradient(
+      160deg,
+      rgba(26,17,11,.78) 0%,
+      rgba(26,17,11,.68) 40%,
+      rgba(26,17,11,.82) 100%
+    );
+    transition:background .5s var(--ease);
+  }
+  .svc-card:hover .svc-overlay{
+    background:linear-gradient(
+      160deg,
+      rgba(26,17,11,.62) 0%,
+      rgba(26,17,11,.50) 40%,
+      rgba(26,17,11,.70) 100%
+    );
+  }
+  /* Gold top accent line on hover */
+  .svc-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:var(--dg);transform:scaleX(0);transform-origin:left;
+    transition:transform .5s var(--ease);z-index:3;
+  }
   .svc-card:hover::before{transform:scaleX(1)}
-  .svc-icon{width:42px;height:42px;color:var(--dg);opacity:.75;margin-bottom:1.5rem;transition:opacity .3s,transform .5s var(--ease)}
-  .svc-card:hover .svc-icon{opacity:1;transform:translateY(-3px)}
-  .svc-ar{font-family:'Cormorant Garamond', serif;font-size:1.1rem;font-weight:600;color:var(--iv);margin-bottom:.25rem}
-  .svc-en{font-family:'Cormorant Garamond',serif;font-size:.7rem;font-weight:300;letter-spacing:.2em;color:var(--dg);text-transform:uppercase;margin-bottom:.9rem;opacity:.7}
-  .svc-desc{font-size:.9rem;color:rgba(232,213,168,.58);line-height:1.75}
-  .svc-arrow{position:absolute;bottom:1.8rem;left:2rem;font-family:'Outfit', sans-serif;font-size:.75rem;color:var(--dg);opacity:0;transform:translateX(-8px);transition:opacity .4s,transform .4s var(--ease)}
+  /* Text layer */
+  .svc-text{
+    position:absolute;inset:0;z-index:2;
+    padding:2.2rem 2rem 2.2rem;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    direction:ltr;
+  }
+  .svc-ar{font-family:'Cormorant Garamond', serif;font-size:1.45rem;font-weight:600;color:var(--iv);margin-bottom:.2rem;line-height:1.2;}
+  .svc-en{font-family:'Outfit', sans-serif;font-size:.65rem;font-weight:400;letter-spacing:.22em;color:var(--dg);text-transform:uppercase;margin-bottom:.8rem;opacity:.8;}
+  .svc-desc{font-family:'Outfit',sans-serif;font-size:.82rem;color:rgba(232,213,168,.66);line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  .svc-arrow{
+    font-family:'Outfit', sans-serif;font-size:.72rem;color:var(--dg);
+    margin-top:1.1rem;display:inline-block;
+    opacity:0;transform:translateX(-8px);
+    transition:opacity .4s,transform .4s var(--ease);
+  }
   .svc-card:hover .svc-arrow{opacity:1;transform:translateX(0)}
+  /* Skeleton loader */
+  .svc-card-skeleton{
+    height:340px;border:1px solid rgba(74,40,32,.3);
+    background:linear-gradient(110deg,rgba(74,40,32,.2) 8%,rgba(74,40,32,.35) 18%,rgba(74,40,32,.2) 33%);
+    background-size:200% 100%;animation:shimmer 1.5s infinite;
+  }
+  @keyframes shimmer{to{background-position:-200% 0}}
 
   /* =================================================================
      PORTFOLIO
@@ -411,48 +472,66 @@
   .pp-dot.a{width:20px;border-radius:3px;background:var(--dg)}
 
   /* =================================================================
-     SVC POPUP
+     SVC POPUP — full-width, image behind dark overlay
   ================================================================= */
   #svc-popup-ov{
     position:fixed;inset:0;z-index:5000;
-    background:rgba(10,5,3,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    background:rgba(10,5,3,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
     display:flex;align-items:center;justify-content:center;padding:1.5rem;
     opacity:0;pointer-events:none;transition:opacity .5s var(--ease)
   }
   #svc-popup-ov.open{opacity:1;pointer-events:all}
-  
+
   #svc-popup{
-    background:var(--oud);border-top:2px solid var(--dg);
-    width:100%;max-width:900px;max-height:92vh;overflow:hidden;
-    position:relative;display:flex;
-    box-shadow:0 40px 120px rgba(0,0,0,.6);
-    flex-direction:row;
-  }
-  .svc-img-pane{
-    flex:1;
     position:relative;
+    width:100%;max-width:820px;max-height:88vh;
     overflow:hidden;
-    background:var(--dw);
-    min-height:300px;
+    box-shadow:0 50px 140px rgba(0,0,0,.75);
+    border:1px solid rgba(196,154,92,.18);
+    display:flex;flex-direction:column;
   }
-  .svc-img-pane img{
-    width:100%;height:100%;object-fit:cover;
-    filter:sepia(.1) saturate(1.1) brightness(.85);
+  /* Full-bleed background image */
+  #svcp-bg{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    object-fit:cover;
+    filter:sepia(.2) saturate(1.1) brightness(.55);
+    transition:filter .6s var(--ease);
   }
-  .svc-content-pane{
-    flex:1;
-    padding:3.5rem 3rem;
+  /* Dark gradient overlay on image */
+  #svcp-overlay{
+    position:absolute;inset:0;
+    background:linear-gradient(
+      135deg,
+      rgba(26,17,11,.88) 0%,
+      rgba(26,17,11,.72) 50%,
+      rgba(26,17,11,.88) 100%
+    );
+    z-index:1;
+  }
+  /* Gold edge bar */
+  #svc-popup::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--dg),transparent);
+    z-index:4;
+  }
+  /* Content sits above overlay */
+  .svcp-inner{
+    position:relative;z-index:2;
+    padding:4rem 4rem 3.5rem;
     direction:ltr;
     overflow-y:auto;
+    max-height:88vh;
   }
-  .svc-content-pane::-webkit-scrollbar{width:4px}
-  .svc-content-pane::-webkit-scrollbar-track{background:transparent}
-  .svc-content-pane::-webkit-scrollbar-thumb{background:var(--hn)}
-  .svcp-ar{font-family:'Cormorant Garamond', serif;font-size:2rem;font-weight:600;color:var(--iv);margin-bottom:.2rem;line-height:1.2}
-  .svcp-en{font-family:'Cormorant Garamond',serif;font-size:.85rem;font-weight:300;letter-spacing:.25em;color:var(--dg);text-transform:uppercase;margin-bottom:1.5rem;opacity:.8}
-  .svcp-desc{font-size:1.05rem;color:rgba(232,213,168,.75);line-height:1.9;margin-bottom:2.5rem}
-  
-  .svc-card { cursor: pointer; }
+  .svcp-inner::-webkit-scrollbar{width:4px}
+  .svcp-inner::-webkit-scrollbar-track{background:transparent}
+  .svcp-inner::-webkit-scrollbar-thumb{background:var(--hn)}
+  .svcp-eyebrow{font-family:'Outfit', sans-serif;font-size:.65rem;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--dg);opacity:.7;margin-bottom:.6rem;}
+  .svcp-ar{font-family:'Cormorant Garamond', serif;font-size:clamp(2.2rem,4vw,3.2rem);font-weight:600;color:var(--iv);line-height:1.1;margin-bottom:.3rem;}
+  .svcp-en{font-family:'Outfit', sans-serif;font-size:.78rem;font-weight:300;letter-spacing:.25em;color:var(--dg);text-transform:uppercase;margin-bottom:2rem;opacity:.75;}
+  .svcp-divider{width:40px;height:1px;background:var(--dg);margin-bottom:2rem;}
+  .svcp-desc{font-family:'Outfit',sans-serif;font-size:1rem;font-weight:300;color:rgba(232,213,168,.82);line-height:2;margin-bottom:3rem;}
+  .svcp-cta-row{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;}
 
   /* =================================================================
      RESPONSIVE
@@ -462,6 +541,7 @@
     .story-img img{height:360px}
     .svc-grid{grid-template-columns:repeat(2,1fr)}
     .contact-g{grid-template-columns:1fr;gap:4rem}
+    .svcp-inner{padding:3rem 2.5rem 2.5rem;}
   }
   @media(max-width:768px){
     .w{padding:0 1.5rem}
@@ -471,6 +551,8 @@
     .hbg{display:flex}
     #ghost{width:85vw;opacity:.04}
     .svc-grid{grid-template-columns:1fr}
+    .svcp-inner{padding:2.5rem 1.8rem 2rem;}
+    .svcp-ar{font-size:2rem;}
     .mq-group{gap:3rem; padding-left:3rem;}
     .mq-group img{height:60px;}
     .work-grid{grid-template-columns:1fr 1fr;grid-auto-rows:180px}
@@ -639,23 +721,27 @@
 <!-- ============================================================
      SERVICE POPUP
 ============================================================ -->
-<div id="svc-popup-ov" role="dialog" aria-modal="true">
+<div id="svc-popup-ov" role="dialog" aria-modal="true" aria-label="Service Details">
   <div id="svc-popup">
-    <button class="pop-close" id="svc-close-btn" aria-label="إغلاق">✕</button>
-    
-    <div class="svc-img-pane">
-      <img id="svcp-img" src="" alt="Service Image">
-    </div>
-    
-    <div class="svc-content-pane">
+    <button class="pop-close" id="svc-close-btn" aria-label="Close">✕</button>
+
+    <!-- Full-bleed background image -->
+    <img id="svcp-bg" src="" alt="">
+    <!-- Dark overlay -->
+    <div id="svcp-overlay"></div>
+
+    <!-- Content -->
+    <div class="svcp-inner">
+      <p class="svcp-eyebrow" id="svcp-eyebrow">Our Expertise</p>
       <h3 class="svcp-ar" id="svcp-title"></h3>
       <p class="svcp-en" id="svcp-subtitle"></p>
-      <div class="pop-bar"></div>
+      <div class="svcp-divider"></div>
       <p class="svcp-desc" id="svcp-text"></p>
-      
-      <button class="btn-primary" onclick="closeSvcPopup(); openPopup();" style="width:100%; justify-content:center;">
-        اطلب عينة لهذا المشروع
-      </button>
+      <div class="svcp-cta-row">
+        <button class="btn-primary" onclick="closeSvcPopup(); openPopup();" style="font-family:'Outfit',sans-serif;font-size:.85rem;padding:.85rem 2.2rem;">
+          Request a Free Sample
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -831,76 +917,14 @@
       <h2 class="sh-title">Our Expertise</h2>
       <p class="sh-en">Comprehensive Artisan Services</p>
     </div>
-    <div class="svc-grid" style="direction:ltr;">
-
-      <div class="svc-card rev" onclick="openSvcPopup(0)">
-        <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2">
-          <path d="M8 36V20q0-6 6-6h20q6 0 6 6v16"/><path d="M4 36h40"/>
-          <path d="M16 14V8h16v6"/><path d="M8 26h32"/>
-        </svg>
-        <p class="svc-ar" style="font-family:'Cormorant Garamond', serif; font-size:1.6rem;">Hotel Upholstery</p>
-        <p class="svc-en" style="font-family:'Outfit', sans-serif;">Five-Star Standards</p>
-        <p class="svc-desc" style="font-family:'Outfit', sans-serif; font-weight:300;">Outfitting luxury hotel furnishings with exquisite natural leather, ensuring flawless execution and timely delivery.</p>
-        <span class="svc-arrow" style="font-family:'Outfit', sans-serif;">Discover More →</span>
-      </div>
-
-      <div class="svc-card rev" onclick="openSvcPopup(1)">
-        <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2">
-          <path d="M6 28l4-10q2-4 6-4h16q4 0 6 4l4 10"/>
-          <rect x="4" y="28" width="40" height="10" rx="1.5"/>
-          <circle cx="14" cy="38" r="4"/><circle cx="34" cy="38" r="4"/>
-        </svg>
-        <p class="svc-ar" style="font-family:'Cormorant Garamond', serif; font-size:1.6rem;">Luxury Automotive</p>
-        <p class="svc-en" style="font-family:'Outfit', sans-serif;">Bespoke Interiors</p>
-        <p class="svc-desc" style="font-family:'Outfit', sans-serif; font-weight:300;">Custom tailoring and upholstering for premium vehicle seats using hand-selected leathers without chemical odors.</p>
-        <span class="svc-arrow" style="font-family:'Outfit', sans-serif;">Discover More →</span>
-      </div>
-
-      <div class="svc-card rev" onclick="openSvcPopup(2)">
-        <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2">
-          <path d="M24 6C14 6 8 14 8 24s6 18 16 18 16-8 16-18"/>
-          <path d="M32 6l8 0 0 8"/><path d="M40 6L28 18"/><circle cx="24" cy="24" r="6"/>
-        </svg>
-        <p class="svc-ar" style="font-family:'Cormorant Garamond', serif; font-size:1.6rem;">Classic Restoration</p>
-        <p class="svc-en" style="font-family:'Outfit', sans-serif;">Revive The Legacy</p>
-        <p class="svc-desc" style="font-family:'Outfit', sans-serif; font-weight:300;">Breathing vibrant life back into antique masterpieces while religiously preserving their authentic aesthetic soul.</p>
-        <span class="svc-arrow" style="font-family:'Outfit', sans-serif;">Discover More →</span>
-      </div>
-
-      <div class="svc-card rev" onclick="openSvcPopup(3)">
-        <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2">
-          <path d="M12 36L8 40l2 2 26-24-2-8-8 4z"/><path d="M28 14l6 6"/>
-          <circle cx="38" cy="10" r="4"/>
-        </svg>
-        <p class="svc-ar" style="font-family:'Cormorant Garamond', serif; font-size:1.6rem;">Bespoke Design</p>
-        <p class="svc-en" style="font-family:'Outfit', sans-serif;">Made To Measure</p>
-        <p class="svc-desc" style="font-family:'Outfit', sans-serif; font-weight:300;">From a sketch to the final sculptural piece, we engineer distinct leather solutions reflecting your exact vision.</p>
-        <span class="svc-arrow" style="font-family:'Outfit', sans-serif;">Discover More →</span>
-      </div>
-
-      <div class="svc-card rev" onclick="openSvcPopup(4)">
-        <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2">
-          <rect x="6" y="6" width="36" height="36"/>
-          <rect x="6" y="6" width="17" height="17"/><rect x="25" y="6" width="17" height="17"/>
-          <rect x="6" y="25" width="17" height="17"/><rect x="25" y="25" width="17" height="17"/>
-        </svg>
-        <p class="svc-ar" style="font-family:'Cormorant Garamond', serif; font-size:1.6rem;">Leather Wall Panels</p>
-        <p class="svc-en" style="font-family:'Outfit', sans-serif;">Architectural Warmth</p>
-        <p class="svc-desc" style="font-family:'Outfit', sans-serif; font-weight:300;">Cladding walls in magnificent architectural leather to cast an aura of unadulterated luxury in corporate venues.</p>
-        <span class="svc-arrow" style="font-family:'Outfit', sans-serif;">Discover More →</span>
-      </div>
-
-      <div class="svc-card rev" onclick="openSvcPopup(5)">
-        <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2">
-          <path d="M24 8l6 6 8-2 2 8 6 6-6 6-2 8-8-2-6 6-6-6-8 2-2-8-6-6 6-6 2-8 8 2z"/>
-          <path d="M20 26l3 3 5-8"/>
-        </svg>
-        <p class="svc-ar" style="font-family:'Cormorant Garamond', serif; font-size:1.6rem;">Contract Maintenance</p>
-        <p class="svc-en" style="font-family:'Outfit', sans-serif;">Eternal Perfection</p>
-        <p class="svc-desc" style="font-family:'Outfit', sans-serif; font-weight:300;">Scheduled luxury maintenance contracts for commercial entities, ensuring your leather appreciates, rather than degrades.</p>
-        <span class="svc-arrow" style="font-family:'Outfit', sans-serif;">Discover More →</span>
-      </div>
-
+    <div class="svc-grid" id="svc-grid" style="direction:ltr;">
+      <!-- Skeleton placeholders (6) -->
+      <div class="svc-card-skeleton rev"></div>
+      <div class="svc-card-skeleton rev"></div>
+      <div class="svc-card-skeleton rev"></div>
+      <div class="svc-card-skeleton rev"></div>
+      <div class="svc-card-skeleton rev"></div>
+      <div class="svc-card-skeleton rev"></div>
     </div>
   </div>
 </section>
@@ -1299,69 +1323,84 @@ document.getElementById('pop-submit').addEventListener('click', ()=>{
 });
 
 /* ===================================================================
-   SERVICE DETAILS POPUP
+   EXPERTISE — Supabase Fetch + Dynamic Cards
 =================================================================== */
-const svcData = [
-  {
-    ar: "Hotel Upholstery",
-    en: "Five-Star Standards",
-    img: "https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/goldenembossonleather",
-    desc: "At Modern Art, we understand that hotel furnishings are the first introduction to your guests. We provide comprehensive upholstery services that meet global five-star specifications, utilizing luxury natural leathers capable of surviving heavy footfall while retaining an aura of pure prestige. From grand lobbies to exclusive guest suites, we deliver flawless execution and strict timeline adherence."
-  },
-  {
-    ar: "Luxury Automotive",
-    en: "Bespoke Interiors",
-    img: "https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/goldenembossonleather",
-    desc: "The interior luxury of your vehicle is just as vital as the power beneath its hood. We offer bespoke automotive interior tailoring utilizing imported architectural leathers. We obsess over the micro-precision of every stitch and thread to grant you a hyper-premium driving experience, engineered safely without overwhelming chemical odors."
-  },
-  {
-    ar: "Classic Restoration",
-    en: "Revive The Legacy",
-    img: "https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/goldenembossonleather",
-    desc: "Antique classics carry priceless memories and heritage. Our master artisans possess the passion required to resurrect these pieces with extraordinary care. We reinforce internal framing, regenerate foaming grids, and reupholster with peak material selections, preserving the authentic visual soul so it may be passed down for generations."
-  },
-  {
-    ar: "Bespoke Design",
-    en: "Made To Measure",
-    img: "https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/goldenembossonleather",
-    desc: "Do you have an exceptional vision? We manifest ideas into magnificent reality. From private royal lounges to VIP stadium suites, we conceptualize and build entirely distinct leather solutions tailored to project your brand's unique identity. We collaborate exclusively with top-tier interior designers to secure legendary outcomes."
-  },
-  {
-    ar: "Leather Wall Panels",
-    en: "Architectural Warmth",
-    img: "https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/goldenembossonleather",
-    desc: "Elevate your venue's architectural grace through magnificent leather wall cladding. Paneling spaces in authentic leather casts an immediate aura of unadulterated luxury and warmth. It serves as an ultimate backdrop for corporate boardrooms, home theaters, and boutique hotel suites, delivering superb acoustic insulation."
-  },
-  {
-    ar: "Contract Maintenance",
-    en: "Eternal Perfection",
-    img: "https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/goldenembossonleather",
-    desc: "Consistent care is the cardinal secret to preserving leather's immaculate state. To grant you absolute peace of mind, we deploy scheduled luxury maintenance contracts across extensive commercial portfolios. Our interventions include deep pore cleansing, advanced hydration, minor scuff healing, and structural tuning to guarantee your leather appreciates over time."
+const SUPA_URL_EN = 'https://whmbrguzumyatnslzfsq.supabase.co';
+const SUPA_KEY_EN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndobWJyZ3V6dW15YXRuc2x6ZnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzNTE2ODksImV4cCI6MjA2NDkyNzY4OX0.xcSogaAHv8uQzhFgEDZ1niFx8lirLiBRvkPpMF174YM';
+
+let svcData = [];
+
+(async function loadExpertise() {
+  const grid = document.getElementById('svc-grid');
+  if (!grid) return;
+
+  try {
+    const res = await fetch(
+      `${SUPA_URL_EN}/rest/v1/expertise_services?select=*&order=sort_order.asc`,
+      {
+        headers: {
+          'apikey': SUPA_KEY_EN,
+          'Authorization': 'Bearer ' + SUPA_KEY_EN
+        }
+      }
+    );
+    if (!res.ok) throw new Error('Failed to fetch expertise_services');
+    svcData = await res.json();
+  } catch(err) {
+    console.warn('Expertise fetch failed, using fallback data.', err);
+    // Fallback data so the section isn't empty
+    svcData = [
+      { title:'Hotel Upholstery',   subtitle:'Five-Star Standards',   description:'Outfitting luxury hotel furnishings with exquisite natural leather, ensuring flawless execution and timely delivery.', image_url:'https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/goldenembossonleather' },
+      { title:'Luxury Automotive',  subtitle:'Bespoke Interiors',     description:'Custom tailoring for premium vehicle seats using hand-selected leathers without chemical odors.', image_url:'https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/goldenembossonleather' },
+      { title:'Classic Restoration',subtitle:'Revive The Legacy',     description:'Breathing vibrant life back into antique masterpieces while preserving their authentic aesthetic soul.', image_url:'https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/goldenembossonleather' },
+      { title:'Bespoke Design',     subtitle:'Made To Measure',       description:'From a sketch to the final sculptural piece, distinct leather solutions reflecting your exact vision.', image_url:'https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/goldenembossonleather' },
+      { title:'Leather Wall Panels',subtitle:'Architectural Warmth',  description:'Cladding walls in magnificent architectural leather to cast an aura of unadulterated luxury.', image_url:'https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/goldenembossonleather' },
+      { title:'Contract Maintenance',subtitle:'Eternal Perfection',   description:'Scheduled luxury maintenance contracts ensuring your leather appreciates, rather than degrades.', image_url:'https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/goldenembossonleather' }
+    ];
   }
-];
+
+  // Render cards
+  grid.innerHTML = svcData.map((s, i) => `
+    <div class="svc-card rev" onclick="openSvcPopup(${i})" tabindex="0" role="button" aria-label="${s.title}">
+      <img class="svc-bg-img" src="${s.image_url}" alt="" loading="lazy" aria-hidden="true">
+      <div class="svc-overlay"></div>
+      <div class="svc-text">
+        <p class="svc-en">${s.subtitle}</p>
+        <p class="svc-ar">${s.title}</p>
+        <p class="svc-desc">${s.description}</p>
+        <span class="svc-arrow">Discover More →</span>
+      </div>
+    </div>
+  `).join('');
+
+  // Re-observe for scroll reveal
+  setTimeout(() => {
+    if (typeof io !== 'undefined') {
+      grid.querySelectorAll('.rev').forEach(el => io.observe(el));
+    }
+  }, 80);
+})();
 
 const svcOv = document.getElementById('svc-popup-ov');
-function openSvcPopup(index){
+function openSvcPopup(index) {
   const data = svcData[index];
-  document.getElementById('svcp-img').src = data.img;
-  document.getElementById('svcp-title').style.fontFamily = "'Cormorant Garamond', serif";
-  document.getElementById('svcp-title').style.fontSize = "2.8rem";
-  document.getElementById('svcp-title').textContent = data.ar;
-  document.getElementById('svcp-subtitle').style.fontFamily = "'Outfit', sans-serif";
-  document.getElementById('svcp-subtitle').textContent = data.en;
-  document.getElementById('svcp-text').style.fontFamily = "'Outfit', sans-serif";
-  document.getElementById('svcp-text').textContent = data.desc;
-  
+  if (!data) return;
+
+  document.getElementById('svcp-bg').src = data.image_url || '';
+  document.getElementById('svcp-title').textContent = data.title;
+  document.getElementById('svcp-subtitle').textContent = data.subtitle;
+  document.getElementById('svcp-text').textContent = data.description;
+
   svcOv.classList.add('open');
-  document.body.style.overflow='hidden';
+  document.body.style.overflow = 'hidden';
 }
-function closeSvcPopup(){
+function closeSvcPopup() {
   svcOv.classList.remove('open');
-  document.body.style.overflow='';
+  document.body.style.overflow = '';
 }
 document.getElementById('svc-close-btn').addEventListener('click', closeSvcPopup);
-svcOv.addEventListener('click', e => { if(e.target===svcOv) closeSvcPopup(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape') closeSvcPopup(); });
+svcOv.addEventListener('click', e => { if (e.target === svcOv) closeSvcPopup(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSvcPopup(); });
 
 /* ===================================================================
    PORTFOLIO HOMEPAGE INJECTION
