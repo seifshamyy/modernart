@@ -163,20 +163,21 @@
   /* =================================================================
      CLIENT TRUST STRIP — moved right after hero
   ================================================================= */
-  #clients{padding:3rem 0;background:var(--oud);border-top:1px solid rgba(196,154,92,.2);border-bottom:1px solid rgba(196,154,92,.2);overflow:hidden;position:relative;z-index:1}
+  #clients{padding:3rem 0;background:#EDE3D5;border-top:1px solid rgba(196,154,92,.35);border-bottom:1px solid rgba(196,154,92,.35);overflow:hidden;position:relative;z-index:1}
   .clients-hd{text-align:center;margin-bottom:2rem}
-  .clients-hd p{font-family:'Outfit', sans-serif;font-size:.65rem;font-weight:300;letter-spacing:.4em;text-transform:uppercase;color:rgba(196,154,92,.45)}
+  .clients-hd p{font-family:'Outfit', sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.4em;text-transform:uppercase;color:rgba(100,60,30,.55)}
   
   /* ===== MARQUEE ===== */
-  .mq-outer{overflow:hidden;position:relative;padding:3.5rem 0;background:linear-gradient(180deg,rgba(44,24,16,.3) 0%,transparent 100%);border-top:1px solid rgba(196,154,92,.1);border-bottom:1px solid rgba(196,154,92,.05)}
+  .mq-outer{overflow:hidden;position:relative;padding:2.5rem 0;background:transparent;border-top:1px solid rgba(196,154,92,.15);border-bottom:1px solid rgba(196,154,92,.1)}
   .mq-outer::before,.mq-outer::after{content:'';position:absolute;top:0;bottom:0;width:150px;z-index:2;pointer-events:none}
-  .mq-outer::before{right:0;background:linear-gradient(to left,var(--oud),transparent)}
-  .mq-outer::after{left:0;background:linear-gradient(to right,var(--oud),transparent)}
-  .mq-track{display:flex;align-items:center;width:max-content;animation:mq 45s linear infinite;will-change:transform}
-  .mq-group{display:flex;align-items:center;gap:8rem;padding-left:8rem;}
-  .mq-group img{height:105px;width:auto;object-fit:contain;transition:transform .5s var(--ease),filter .5s var(--ease);filter:drop-shadow(0 6px 16px rgba(196,154,92,.15))}
-  .mq-group img:hover{transform:scale(1.15);filter:drop-shadow(0 12px 28px rgba(196,154,92,.4))}
-  @keyframes mq{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+  .mq-outer::before{right:0;background:linear-gradient(to left,#EDE3D5,transparent)}
+  .mq-outer::after{left:0;background:linear-gradient(to right,#EDE3D5,transparent)}
+  .mq-track{display:flex;align-items:center;width:max-content;will-change:transform;animation:mq 30s linear infinite}
+  /* LTR adjustment: padding on the right to separate from Group 2 */
+  .mq-group{display:flex;align-items:center;gap:6rem;padding-right:6rem;flex-shrink:0}
+  .mq-group img{height:130px;width:auto;max-width:220px;object-fit:contain;transition:transform .5s var(--ease),filter .5s var(--ease);filter:brightness(0.15) contrast(1.2)}
+  .mq-group img:hover{transform:scale(1.12);filter:brightness(0) sepia(1) saturate(4) hue-rotate(10deg)}
+  @keyframes mq{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(-50%,0,0)}}
 
   /* =================================================================
      STORY
@@ -1459,10 +1460,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     if(!res.ok) throw new Error("Failed to fetch from DB");
     const clients = await res.json();
     
-    // We duplicate the group to ensure a seamless looping marquee
-    const groupHTML = clients.map(c => `
+    // We duplicate the items 4x to ensure a massive group width that overtakes any ultrawide screen
+    // This entirely prevents the gap issue that occurs when group 2 finishes before the viewport ends
+    const baseHTML = clients.map(c => `
       <img src="${c.logo_url}" alt="${c.name || 'Client Logo'}" loading="lazy">
     `).join('');
+    
+    const groupHTML = baseHTML + baseHTML + baseHTML + baseHTML;
     
     mqTrack.innerHTML = `
       <!-- Group 1 -->
@@ -1474,6 +1478,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         ${groupHTML}
       </div>
     `;
+    
+    // Scale duration dynamically so it doesn't zip incredibly fast given the 4x items
+    // Approximately 15 seconds per original set
+    mqTrack.style.animationDuration = (clients.length * 4 * 1.8) + 's';
   } catch (err) {
     console.error("Clients DB Load Error:", err);
     // Silent fail -> track remains empty or we can put fallback
