@@ -757,7 +757,7 @@
     <li><a href="#services">Expertise</a></li>
     <li><a href="#work">Portfolio</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="../" style="font-family:'Outfit', sans-serif; font-weight:600; color:var(--dg); margin-left:1rem; border-bottom:1px solid var(--dg); padding-bottom:2px;">[ AR ]</a></li>
+    <li><a href="../" style="font-family:'Outfit', sans-serif; font-size:0.75rem; font-weight:700; color:var(--dw); background-color:var(--dg); padding:0.2rem 0.5rem; border-radius:3px; margin-left:1rem; text-decoration:none; letter-spacing:0.05em;">AR</a></li>
   </ul>
   <a href="https://wa.me/201008942666" class="nav-wa" target="_blank" rel="noopener">WhatsApp →</a>
   <button class="hbg" id="hbg" aria-label="القائمة"><span></span><span></span><span></span></button>
@@ -1438,6 +1438,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 100);
   } catch (err) {
     console.error("Portfolio DB Load Error:", err);
+  }
+});
+
+/* ===================================================================
+   CLIENTS SECTION MARQUEE (Supabase Fetch)
+=================================================================== */
+document.addEventListener("DOMContentLoaded", async () => {
+  const mqTrack = document.getElementById('mq-track');
+  if(!mqTrack) return;
+  
+  try {
+    const res = await fetch(`${SUPA_URL_EN}/rest/v1/partner_logos?select=*&order=sort_order.asc`, {
+      headers: {
+        'apikey': SUPA_KEY_EN,
+        'Authorization': 'Bearer ' + SUPA_KEY_EN
+      }
+    });
+    
+    if(!res.ok) throw new Error("Failed to fetch from DB");
+    const clients = await res.json();
+    
+    // We duplicate the group to ensure a seamless looping marquee
+    const groupHTML = clients.map(c => `
+      <img src="${c.logo_url}" alt="${c.name || 'Client Logo'}" loading="lazy">
+    `).join('');
+    
+    mqTrack.innerHTML = `
+      <!-- Group 1 -->
+      <div class="mq-group">
+        ${groupHTML}
+      </div>
+      <!-- Group 2 for seamless loop -->
+      <div class="mq-group" aria-hidden="true">
+        ${groupHTML}
+      </div>
+    `;
+  } catch (err) {
+    console.error("Clients DB Load Error:", err);
+    // Silent fail -> track remains empty or we can put fallback
   }
 });
 </script>

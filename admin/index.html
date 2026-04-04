@@ -125,6 +125,7 @@
   <div class="tab-nav">
     <button class="tab-btn active" id="tab-portfolio" onclick="switchTab('portfolio')">Portfolio</button>
     <button class="tab-btn" id="tab-expertise" onclick="switchTab('expertise')">Expertise Services</button>
+    <button class="tab-btn" id="tab-clients" onclick="switchTab('clients')">Clients / Partners</button>
   </div>
 
   <!-- Portfolio tab -->
@@ -137,6 +138,16 @@
   <!-- Expertise tab -->
   <div id="pane-expertise" style="display:none;">
     <div class="svc-mgr-grid" id="expertise-grid">
+      <!-- Rendered via JS -->
+    </div>
+  </div>
+
+  <!-- Clients tab -->
+  <div id="pane-clients" style="display:none;">
+    <div style="margin-bottom:1.5rem;">
+      <button class="btn-outline" onclick="openClientEditor()">+ إضافة عميل (Add Client)</button>
+    </div>
+    <div class="svc-mgr-grid" id="clients-grid">
       <!-- Rendered via JS -->
     </div>
   </div>
@@ -300,6 +311,43 @@
     </div>
 
     <button class="btn-primary" onclick="saveExpertise()" style="width:100%;margin-top:1rem;">حفظ · Save</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     CLIENTS EDITOR MODAL
+================================================================= -->
+<div id="client-modal-ov" style="position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:1.5rem;">
+  <div id="client-modal" style="background:var(--oud);border:1px solid rgba(196,154,92,.2);border-top:2px solid var(--dg);padding:2rem;border-radius:6px;width:100%;max-width:500px;position:relative;">
+    <button class="em-close" onclick="closeClientModal()">✕</button>
+    <h3 id="client-modal-title" style="font-family:'Reem Kufi',sans-serif;color:var(--dg);margin-bottom:1.5rem;font-size:1.2rem;">تعديل عميل · Edit Client</h3>
+    <input type="hidden" id="client-id">
+
+    <div class="form-group" dir="rtl">
+      <label>اسم العميل / Brand Name</label>
+      <input type="text" id="client-name">
+    </div>
+    
+    <div class="form-group" dir="rtl">
+      <label>ترتيب الظهور (Sort Order)</label>
+      <input type="number" id="client-sort" value="0">
+    </div>
+
+    <!-- Client logo upload -->
+    <div class="form-group" dir="rtl">
+      <label>الشعار · Logo (SVG/PNG preferred)</label>
+      <img class="exp-img-preview" id="client-img-preview" src="" alt="Preview" style="object-fit:contain;background:rgba(255,255,255,0.05);">
+      <div class="upload-box">
+        <span style="color:var(--dg)">اسحب أو اضغط للرفع</span>
+        <input type="file" id="client-img-file" accept="image/*" onchange="uploadClientImage(this)">
+        <p class="upload-status" id="client-img-status">جاري الرفع...</p>
+      </div>
+      <input type="hidden" id="client-img-url">
+    </div>
+
+    <div style="display:flex;gap:1rem;margin-top:1.5rem;">
+      <button class="btn-primary" onclick="saveClient()" style="flex:1;">حفظ · Save</button>
+    </div>
   </div>
 </div>
 
@@ -568,10 +616,15 @@ function switchTab(tab) {
   currentTab = tab;
   document.getElementById('pane-portfolio').style.display = tab === 'portfolio' ? '' : 'none';
   document.getElementById('pane-expertise').style.display = tab === 'expertise' ? '' : 'none';
+  document.getElementById('pane-clients').style.display = tab === 'clients' ? '' : 'none';
+  
   document.getElementById('btn-add-project').style.display = tab === 'portfolio' ? '' : 'none';
   document.getElementById('tab-portfolio').classList.toggle('active', tab === 'portfolio');
   document.getElementById('tab-expertise').classList.toggle('active', tab === 'expertise');
+  document.getElementById('tab-clients').classList.toggle('active', tab === 'clients');
+  
   if (tab === 'expertise') loadExpertiseServices();
+  if (tab === 'clients') loadClients();
 }
 
 /* ===================================================================
@@ -675,6 +728,143 @@ async function uploadExpImage(inputEl) {
     const prev = document.getElementById('exp-img-preview');
     prev.src = finalUrl;
     prev.style.display = 'block';
+    stEl.textContent = 'تم الرفع بنجاح ✓';
+    stEl.style.color = '#4CAF50';
+    setTimeout(() => stEl.style.display = 'none', 3000);
+  } catch(err) {
+    stEl.textContent = 'فشل الرفع!';
+    stEl.style.color = '#ff6b6b';
+    console.error(err);
+  }
+  inputEl.value = '';
+}
+
+/* ===================================================================
+   CLIENTS/PARTNERS CRUD
+=================================================================== */
+let allClients = [];
+
+async function loadClients() {
+  showLoading('جاري جلب العملاء...');
+  const { data, error } = await supaClient
+    .from('partner_logos')
+    .select('*')
+    .order('sort_order', { ascending: true });
+  hideLoading();
+  if (error) { alert('Error: ' + error.message); return; }
+  allClients = data || [];
+  renderClientsGrid();
+}
+
+function renderClientsGrid() {
+  const grid = document.getElementById('clients-grid');
+  if (!allClients.length) {
+    grid.innerHTML = '<p style="color:rgba(255,255,255,.4);padding:2rem;">لا يوجد عملاء. يمكنك إضافة عميل جديد.</p>';
+    return;
+  }
+  grid.innerHTML = allClients.map(c => `
+    <div class="svc-mgr-card">
+      <div style="background:rgba(255,255,255,0.05);padding:1rem;display:flex;align-items:center;justify-content:center;height:140px;">
+        <img class="svc-mgr-img" src="${c.logo_url}" alt="${c.name}" onerror="this.style.display='none'" style="height:auto;max-height:80px;object-fit:contain;">
+      </div>
+      <div class="svc-mgr-body">
+        <p class="svc-mgr-title">${c.name}</p>
+        <p class="svc-mgr-sub">ترتيب: ${c.sort_order}</p>
+        <div class="p-actions">
+          <button class="btn-sm btn-edit" onclick="editClient('${c.id}')">تعديل</button>
+          <button class="btn-sm btn-del" onclick="deleteClient('${c.id}')">حذف</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openClientEditor() {
+  document.getElementById('client-modal-title').textContent = 'إضافة عميل · Add Client';
+  document.getElementById('client-id').value = '';
+  document.getElementById('client-name').value = '';
+  document.getElementById('client-sort').value = '0';
+  document.getElementById('client-img-url').value = '';
+  document.getElementById('client-img-preview').style.display = 'none';
+  document.getElementById('client-img-preview').src = '';
+  document.getElementById('client-modal-ov').style.display = 'flex';
+}
+
+function editClient(id) {
+  const c = allClients.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('client-modal-title').textContent = 'تعديل عميل · Edit Client';
+  document.getElementById('client-id').value = c.id;
+  document.getElementById('client-name').value = c.name || '';
+  document.getElementById('client-sort').value = c.sort_order || '0';
+  document.getElementById('client-img-url').value = c.logo_url || '';
+  const prev = document.getElementById('client-img-preview');
+  if (c.logo_url) { prev.src = c.logo_url; prev.style.display = 'block'; }
+  else { prev.style.display = 'none'; }
+  document.getElementById('client-modal-ov').style.display = 'flex';
+}
+
+function closeClientModal() {
+  document.getElementById('client-modal-ov').style.display = 'none';
+}
+
+async function saveClient() {
+  const id = document.getElementById('client-id').value;
+  const payload = {
+    name:       document.getElementById('client-name').value.trim(),
+    sort_order: parseInt(document.getElementById('client-sort').value) || 0,
+    logo_url:   document.getElementById('client-img-url').value.trim()
+  };
+  if (!payload.name || !payload.logo_url) { alert('الاسم والشعار مطلوبان'); return; }
+  
+  showLoading('جاري الحفظ...');
+  
+  let result;
+  if(id) {
+    result = await supaClient.from('partner_logos').update(payload).eq('id', id);
+  } else {
+    result = await supaClient.from('partner_logos').insert([payload]);
+  }
+  
+  hideLoading();
+  if (result.error) { alert('Error: ' + result.error.message); return; }
+  closeClientModal();
+  loadClients();
+}
+
+async function deleteClient(id) {
+  if(!confirm("هل أنت متأكد من حذف هذا العميل؟")) return;
+  
+  showLoading("جاري الحذف...");
+  const { error } = await supaClient.from('partner_logos').delete().eq('id', id);
+  hideLoading();
+  
+  if (error) alert("Error: " + error.message);
+  else loadClients();
+}
+
+async function uploadClientImage(inputEl) {
+  if (!inputEl.files || !inputEl.files[0]) return;
+  const file = inputEl.files[0];
+  const stEl = document.getElementById('client-img-status');
+  stEl.style.display = 'block';
+  stEl.textContent = 'جاري الرفع...';
+  stEl.style.color = 'var(--dg)';
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('filename', file.name);
+    const res = await fetch(WEBHOOK_URL, { method: 'POST', body: fd });
+    if (!res.ok) throw new Error('Upload Failed');
+    const json = await res.json();
+    const finalUrl = json.link;
+    if (!finalUrl) throw new Error('No link returned');
+    
+    document.getElementById('client-img-url').value = finalUrl;
+    const prev = document.getElementById('client-img-preview');
+    prev.src = finalUrl;
+    prev.style.display = 'block';
+    
     stEl.textContent = 'تم الرفع بنجاح ✓';
     stEl.style.color = '#4CAF50';
     setTimeout(() => stEl.style.display = 'none', 3000);
