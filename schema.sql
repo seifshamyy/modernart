@@ -251,3 +251,36 @@ INSERT INTO public.partner_logos (sort_order, name, logo_url) VALUES
   (6, 'Pizza Hut', 'https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/pizzahut'),
   (7, 'Hanimex', 'https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/hanimex'),
   (8, 'Cecil', 'https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/cecil');
+
+
+-- ==========================================
+-- SUPABASE SCHEMA: site_settings
+-- Run this in the Supabase SQL editor.
+-- Stores global site configuration as key/value pairs.
+-- ==========================================
+
+CREATE TABLE IF NOT EXISTS public.site_settings (
+    key   TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    label TEXT NOT NULL DEFAULT '',          -- human-readable label for CMS
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable Row Level Security
+ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
+
+-- Public read (the front-end fetches the video URL without auth)
+CREATE POLICY "Public read site_settings"
+  ON public.site_settings
+  FOR SELECT USING (true);
+
+-- Authenticated users (service role / admin) can update
+CREATE POLICY "Auth update site_settings"
+  ON public.site_settings
+  FOR UPDATE USING (auth.role() = 'service_role');
+
+-- Seed: default values
+INSERT INTO public.site_settings (key, value, label) VALUES
+  ('hero_video_url',  'https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/HEROVID',              'Hero Background Video URL'),
+  ('story_image_url', 'https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/goldenembossonleather', 'Our Story Section — Photo')
+ON CONFLICT (key) DO NOTHING;

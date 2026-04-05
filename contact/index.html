@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تواصل معنا · Modern Art Leather</title>
+  <link rel="icon" href="https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/coverpage%20(1).png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Amiri:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Tajawal:wght@200;300;400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+  :root{
+    --dw:#1A110B;--oud:#2C1810;--hn:#4A2820;--cu:#6B3A2A;
+    --dg:#C49A5C;--lg:#D4B87A;--pa:#E8D5A8;--iv:#F5EDD8;
+    --ease:cubic-bezier(0.22,1,0.36,1);
+  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;font-size:16px}
+  body{background:var(--dw);color:var(--pa);font-family:'Amiri',serif;line-height:1.7;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+  button{font-family:inherit;border:none;cursor:pointer}
+
+  /* TEXTURE */
+  .grain{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.033;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E") repeat}
+  .geo-bg{position:absolute;inset:0;pointer-events:none;opacity:.04;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 2L58 17v26L30 58 2 43V17z' fill='none' stroke='%23C49A5C' stroke-width='.4'/%3E%3Cpath d='M30 12l18 10v18L30 50 12 40V22z' fill='none' stroke='%23C49A5C' stroke-width='.4'/%3E%3C/svg%3E") repeat}
+
+  /* NAV */
+  #nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:1.5rem 4rem;display:flex;align-items:center;justify-content:space-between;direction:rtl;transition:background .6s var(--ease),padding .5s var(--ease)}
+  #nav.s{background:rgba(26,17,11,.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:1rem 4rem}
+  .nav-logo{height:56px;filter:none!important;cursor:pointer}
+  .nav-links{display:flex;gap:2.5rem;list-style:none}
+  .nav-links a{font-family:'Tajawal',sans-serif;font-size:.85rem;color:rgba(232,213,168,.75);position:relative;transition:color .3s}
+  .nav-links a::after{content:'';position:absolute;bottom:-3px;right:0;width:0;height:1px;background:var(--dg);transition:width .35s var(--ease)}
+  .nav-links a:hover,.nav-links a.active{color:var(--dg)}
+  .nav-links a:hover::after,.nav-links a.active::after{width:100%}
+  .nav-wa{font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:500;color:var(--dg);border:1px solid var(--dg);padding:.4rem 1.1rem;transition:background .3s,color .3s}
+  .nav-wa:hover{background:var(--dg);color:var(--dw)}
+  .hbg{display:none;flex-direction:column;gap:5px;background:transparent;padding:4px;cursor:pointer;border:none}
+  .hbg span{display:block;width:22px;height:1.5px;background:var(--pa);transition:all .3s}
+  #mnav{position:fixed;inset:0;background:var(--oud);z-index:199;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+  #mnav.open{opacity:1;pointer-events:all}
+  #mnav a{font-family:'Tajawal',sans-serif;font-size:1.3rem;color:var(--pa);transition:color .3s}
+  #mnav a:hover{color:var(--dg)}
+
+  /* HERO */
+  .contact-hero{
+    min-height:55vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+    text-align:center;padding:0 2rem 5rem;position:relative;overflow:hidden;
+  }
+  .contact-hero-bg{
+    position:absolute;inset:0;
+    background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(196,154,92,.07) 0%,transparent 70%),
+               linear-gradient(to bottom,var(--dw) 0%,var(--oud) 50%,var(--dw) 100%);
+  }
+  .ch-inner{position:relative;z-index:2;max-width:700px;margin:0 auto}
+  .ch-eyebrow{
+    font-family:'Tajawal',sans-serif;font-size:.7rem;font-weight:500;letter-spacing:.4em;
+    text-transform:uppercase;color:var(--dg);display:inline-flex;align-items:center;gap:.8rem;margin-bottom:1.4rem;
+  }
+  .ch-eyebrow::before,.ch-eyebrow::after{content:'';width:28px;height:1px;background:var(--dg)}
+  .ch-title{font-family:'Reem Kufi',sans-serif;font-size:clamp(3rem,8vw,6rem);font-weight:600;color:var(--iv);line-height:1.05;margin-bottom:1.5rem}
+  .ch-desc{font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:300;color:rgba(232,213,168,.6);line-height:2;max-width:520px;margin:0 auto}
+
+  /* WHAT YOU GET STRIP */
+  .promise-strip{
+    display:flex;justify-content:center;gap:0;
+    border-top:1px solid rgba(196,154,92,.12);
+    border-bottom:1px solid rgba(196,154,92,.12);
+    max-width:1000px;margin:0 auto 6rem;
+  }
+  .promise-item{
+    flex:1;text-align:center;padding:2.2rem 1.5rem;
+    border-left:1px solid rgba(196,154,92,.12);
+  }
+  .promise-item:last-child{border-left:none}
+  .promise-ico{
+    width:36px;height:36px;margin:0 auto .8rem;color:var(--dg);opacity:.8;
+  }
+  .promise-title{font-family:'Reem Kufi',sans-serif;font-size:.95rem;color:var(--iv);margin-bottom:.3rem}
+  .promise-body{font-family:'Tajawal',sans-serif;font-size:.78rem;font-weight:300;color:rgba(232,213,168,.5);line-height:1.8}
+
+  /* MAIN CONTACT GRID */
+  .contact-main{max-width:1100px;margin:0 auto;padding:0 2rem 8rem}
+  .contact-g{display:grid;grid-template-columns:1fr 1.4fr;gap:7rem;align-items:start}
+
+  /* INFO SIDE */
+  .cinfo{direction:rtl}
+  .cinfo-heading{font-family:'Reem Kufi',sans-serif;font-size:1.5rem;color:var(--iv);margin-bottom:.6rem}
+  .cinfo-sub{font-family:'Tajawal',sans-serif;font-size:.88rem;font-weight:300;color:rgba(232,213,168,.55);line-height:1.9;margin-bottom:2.5rem}
+  .ci{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.8rem}
+  .ci-ico{width:18px;height:18px;color:var(--dg);flex-shrink:0;margin-top:4px;opacity:.8}
+  .ci-label{font-family:'Tajawal',sans-serif;font-size:.65rem;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:rgba(196,154,92,.5);display:block;margin-bottom:.25rem}
+  .ci-val{font-size:.98rem;color:var(--pa)}
+  .ci-val a:hover{color:var(--dg)}
+  .wa-cta{
+    display:inline-flex;align-items:center;gap:.7rem;
+    padding:1rem 1.8rem;width:100%;justify-content:center;
+    background:rgba(27,77,74,.2);border:1px solid rgba(37,211,102,.25);
+    color:var(--pa);font-family:'Tajawal',sans-serif;font-size:.88rem;font-weight:500;
+    margin-top:2rem;transition:all .4s var(--ease);border-radius:2px;
+  }
+  .wa-cta:hover{background:rgba(27,77,74,.5);border-color:#25D366;transform:translateY(-2px)}
+  .hours-block{margin-top:2.5rem;padding-top:2rem;border-top:1px solid rgba(74,40,32,.4)}
+  .hours-title{font-family:'Tajawal',sans-serif;font-size:.68rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--dg);margin-bottom:1rem}
+  .hours-row{display:flex;justify-content:space-between;font-family:'Tajawal',sans-serif;font-size:.82rem;color:rgba(232,213,168,.6);padding:.35rem 0;border-bottom:1px solid rgba(74,40,32,.25)}
+  .hours-row:last-child{border-bottom:none}
+  .hours-row span{color:rgba(196,154,92,.7)}
+
+  /* FORM SIDE */
+  .cform{direction:rtl}
+  .cform-heading{font-family:'Reem Kufi',sans-serif;font-size:1.5rem;color:var(--iv);margin-bottom:.6rem}
+  .cform-sub{font-family:'Tajawal',sans-serif;font-size:.88rem;font-weight:300;color:rgba(232,213,168,.55);line-height:1.9;margin-bottom:2.5rem}
+  .fg{position:relative;margin-bottom:2.5rem}
+  .fg label{position:absolute;top:.75rem;right:0;font-family:'Tajawal',sans-serif;font-size:.82rem;font-weight:300;color:rgba(232,213,168,.38);transition:all .3s var(--ease);pointer-events:none}
+  .fg input,.fg select,.fg textarea{width:100%;background:transparent;border:none;border-bottom:1px solid var(--hn);padding:.75rem 0;color:var(--pa);font-family:'Amiri',serif;font-size:.98rem;outline:none;direction:rtl;transition:border-color .3s}
+  .fg input:focus,.fg select:focus,.fg textarea:focus{border-bottom-color:var(--dg)}
+  .fg input:focus+label,.fg input:not(:placeholder-shown)+label,.fg select:focus+label,.fg textarea:focus+label,.fg textarea:not(:placeholder-shown)+label{top:-1rem;font-size:.65rem;color:var(--dg);letter-spacing:.1em}
+  .fg input::placeholder,.fg textarea::placeholder{color:transparent}
+  .fg select option{background:var(--oud);color:var(--pa)}
+  .fg textarea{resize:none;height:120px}
+  .fg-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+  .fsub{
+    width:100%;background:transparent;border:1px solid var(--dg);
+    color:var(--dg);padding:1.1rem 2rem;
+    font-family:'Tajawal',sans-serif;font-size:.88rem;font-weight:500;letter-spacing:.1em;
+    transition:all .4s var(--ease);margin-top:.8rem;border-radius:2px;
+  }
+  .fsub:hover{background:var(--dg);color:var(--dw);transform:translateY(-1px)}
+  .form-note{font-family:'Tajawal',sans-serif;font-size:.72rem;color:rgba(232,213,168,.35);margin-top:1rem;text-align:center;line-height:1.8}
+
+  /* NEXT STEPS */
+  .next-sec{
+    background:var(--oud);
+    border-top:1px solid rgba(196,154,92,.1);
+    border-bottom:1px solid rgba(196,154,92,.1);
+    padding:6rem 2rem;
+  }
+  .next-inner{max-width:1000px;margin:0 auto}
+  .next-header{text-align:center;margin-bottom:4rem}
+  .next-eyebrow{font-family:'Tajawal',sans-serif;font-size:.68rem;letter-spacing:.35em;text-transform:uppercase;color:var(--dg);display:inline-flex;align-items:center;gap:.7rem;margin-bottom:.8rem}
+  .next-eyebrow::before{content:'';width:20px;height:1px;background:var(--dg)}
+  .next-title{font-family:'Reem Kufi',sans-serif;font-size:clamp(1.8rem,3.5vw,2.6rem);color:var(--iv);margin-top:.5rem}
+  .next-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2.5rem}
+  .next-step{text-align:center;padding:2rem 1.5rem}
+  .next-num{
+    font-family:'Cormorant Garamond',serif;font-size:3.5rem;font-weight:300;
+    color:rgba(196,154,92,.2);line-height:1;display:block;margin-bottom:.8rem;
+  }
+  .next-step-title{font-family:'Reem Kufi',sans-serif;font-size:1.05rem;color:var(--iv);margin-bottom:.6rem}
+  .next-step-body{font-family:'Tajawal',sans-serif;font-size:.82rem;font-weight:300;color:rgba(232,213,168,.5);line-height:1.9}
+
+  /* FOOTER LINE */
+  .port-foot{
+    border-top:1px solid rgba(196,154,92,.12);padding:2rem 4rem;
+    display:flex;align-items:center;justify-content:space-between;
+    font-family:'Tajawal',sans-serif;font-size:.75rem;color:rgba(232,213,168,.35);direction:rtl;
+  }
+  .port-foot a{color:var(--dg);opacity:.7;transition:opacity .3s}
+  .port-foot a:hover{opacity:1}
+
+  /* SUCCESS STATE */
+  .form-success{
+    display:none;text-align:center;padding:3rem 2rem;
+    border:1px solid rgba(196,154,92,.2);border-radius:2px;background:rgba(196,154,92,.04);
+  }
+  .form-success.show{display:block}
+  .form-success svg{color:var(--dg);margin:0 auto 1rem}
+  .form-success h3{font-family:'Reem Kufi',sans-serif;font-size:1.5rem;color:var(--iv);margin-bottom:.5rem}
+  .form-success p{font-family:'Tajawal',sans-serif;font-size:.9rem;color:rgba(232,213,168,.6);line-height:1.9}
+
+  /* RESPONSIVE */
+  @media(max-width:900px){
+    #nav{padding:1.5rem 2rem}
+    #nav.s{padding:1rem 2rem}
+    .promise-strip{flex-wrap:wrap}
+    .promise-item{flex:0 0 50%;border-left:none;border-top:1px solid rgba(196,154,92,.12)}
+    .contact-g{grid-template-columns:1fr;gap:4rem}
+    .next-grid{grid-template-columns:1fr}
+  }
+  @media(max-width:768px){
+    #nav{padding:1rem 1.5rem}
+    #nav.s{padding:1rem 1.5rem}
+    .nav-links,.nav-wa{display:none}
+    .hbg{display:flex}
+    .contact-main{padding:0 1.5rem 6rem}
+    .fg-row{grid-template-columns:1fr}
+    .port-foot{flex-direction:column;gap:1rem;text-align:center;padding:2rem 1.5rem}
+  }
+  @media(max-width:480px){
+    .promise-strip{flex-direction:column}
+    .promise-item{flex:none;border-top:1px solid rgba(196,154,92,.12);border-left:none}
+  }
+  </style>
+</head>
+<body>
+<div class="grain"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="../">
+    <img src="https://pub-caa62f1b5ec34522975fc2acc07b5053.r2.dev/coverpage%20(1).png" alt="Modern Art Leather" class="nav-logo">
+  </a>
+  <ul class="nav-links">
+    <li><a href="../#story">قصتنا</a></li>
+    <li><a href="../#services">خدماتنا</a></li>
+    <li><a href="../portfolio/">أعمالنا</a></li>
+    <li><a href="./" class="active">تواصل معنا</a></li>
+    <li><a href="../en/contact/" style="font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:700;color:var(--dw);background:var(--dg);padding:.2rem .5rem;border-radius:3px;margin-right:1rem;letter-spacing:.05em">EN</a></li>
+  </ul>
+  <a href="https://wa.me/201008942666" class="nav-wa" target="_blank" rel="noopener">واتساب ←</a>
+  <button class="hbg" id="hbg" aria-label="القائمة"><span></span><span></span><span></span></button>
+</nav>
+<div id="mnav">
+  <a href="../#story"    onclick="closeMnav()">قصتنا</a>
+  <a href="../#services" onclick="closeMnav()">خدماتنا</a>
+  <a href="../portfolio/" onclick="closeMnav()">أعمالنا</a>
+  <a href="./"           onclick="closeMnav()">تواصل معنا</a>
+</div>
+
+<!-- HERO -->
+<section class="contact-hero">
+  <div class="contact-hero-bg"></div>
+  <div class="geo-bg"></div>
+  <div class="ch-inner">
+    <h1 class="ch-title">لنبني شيئًا<br>معًا</h1>
+    <p class="ch-desc">
+      سواء كان مشروعك فندقيًا ضخمًا أو قطعة واحدة في مجلسك الخاص — نحن هنا للاستماع. أرسل لنا تفاصيلك وسنتواصل معك خلال ٢٤ ساعة.
+    </p>
+  </div>
+</section>
+
+<!-- PROMISE STRIP -->
+<div class="promise-strip">
+  <div class="promise-item">
+    <svg class="promise-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <div class="promise-title">رد خلال ٢٤ ساعة</div>
+    <div class="promise-body">نلتزم بالرد على كل استفسار بسرعة واحترافية</div>
+  </div>
+  <div class="promise-item">
+    <svg class="promise-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <div class="promise-title">معاينة مجانية</div>
+    <div class="promise-body">نزور موقعك ونقيّم المشروع بدون أي تكلفة</div>
+  </div>
+  <div class="promise-item">
+    <svg class="promise-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>
+    </svg>
+    <div class="promise-title">عينة مجانية</div>
+    <div class="promise-body">اختر خاماتك قبل اتخاذ أي قرار نهائي</div>
+  </div>
+  <div class="promise-item">
+    <svg class="promise-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+    </svg>
+    <div class="promise-title">ضمان الجودة</div>
+    <div class="promise-body">كل قطعة تخرج من ورشتنا مضمونة بالكامل</div>
+  </div>
+</div>
+
+<!-- CONTACT MAIN -->
+<div class="contact-main">
+  <div class="contact-g">
+
+    <!-- INFO -->
+    <div class="cinfo">
+      <h2 class="cinfo-heading">تحدّث معنا مباشرة</h2>
+      <p class="cinfo-sub">فريقنا جاهز للإجابة على أسئلتك وتقديم استشارة مجانية بلا أي التزام.</p>
+
+      <div class="ci">
+        <svg class="ci-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+        </svg>
+        <div>
+          <span class="ci-label">الهاتف</span>
+          <p class="ci-val"><a href="tel:+201008942666">+20 100 894 2666</a></p>
+        </div>
+      </div>
+
+      <div class="ci">
+        <svg class="ci-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+        <div>
+          <span class="ci-label">البريد الإلكتروني</span>
+          <p class="ci-val"><a href="mailto:studio@modernartleather.com">studio@modernartleather.com</a></p>
+        </div>
+      </div>
+
+      <div class="ci">
+        <svg class="ci-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+          <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        <div>
+          <span class="ci-label">الموقع</span>
+          <p class="ci-val">القاهرة، مصر</p>
+        </div>
+      </div>
+
+      <a href="https://wa.me/201008942666" class="wa-cta" target="_blank" rel="noopener">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413A11.815 11.815 0 0012.05 0z"/>
+        </svg>
+        تواصل عبر واتساب
+      </a>
+
+      <div class="hours-block">
+        <div class="hours-title">ساعات العمل</div>
+        <div class="hours-row"><span>السبت – الخميس</span> ٩ ص – ٦ م</div>
+        <div class="hours-row"><span>الجمعة</span> مغلق</div>
+        <div class="hours-row"><span>واتساب</span> ٢٤/٧</div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <div>
+      <form class="cform" id="contact-form" onsubmit="submitContact(event)">
+        <h2 class="cform-heading">أرسل لنا رسالة</h2>
+        <p class="cform-sub">اترك تفاصيل مشروعك وسنتواصل معك بعرض مناسب.</p>
+
+        <div class="fg-row">
+          <div class="fg">
+            <input type="text" id="fn" name="name" placeholder="x" required>
+            <label for="fn">الاسم الكامل *</label>
+          </div>
+          <div class="fg">
+            <input type="tel" id="fp" name="phone" placeholder="x">
+            <label for="fp">رقم الهاتف</label>
+          </div>
+        </div>
+
+        <div class="fg">
+          <input type="email" id="fe" name="email" placeholder="x">
+          <label for="fe">البريد الإلكتروني</label>
+        </div>
+
+        <div class="fg">
+          <select id="ft" name="type">
+            <option value=""></option>
+            <option value="تنجيد فندقي">تنجيد فندقي</option>
+            <option value="تنجيد سكني">تنجيد سكني</option>
+            <option value="تنجيد مكاتب">تنجيد مكاتب</option>
+            <option value="تنجيد سيارات">تنجيد سيارات</option>
+            <option value="ترميم وصيانة">ترميم وصيانة</option>
+            <option value="أخرى">أخرى</option>
+          </select>
+          <label for="ft">نوع المشروع</label>
+        </div>
+
+        <div class="fg">
+          <select id="fb" name="budget">
+            <option value=""></option>
+            <option value="أقل من ٥٠٠٠ جنيه">أقل من ٥,٠٠٠ جنيه</option>
+            <option value="٥٠٠٠ – ٢٠٠٠٠ جنيه">٥,٠٠٠ – ٢٠,٠٠٠ جنيه</option>
+            <option value="٢٠٠٠٠ – ٥٠٠٠٠ جنيه">٢٠,٠٠٠ – ٥٠,٠٠٠ جنيه</option>
+            <option value="أكثر من ٥٠٠٠٠ جنيه">أكثر من ٥٠,٠٠٠ جنيه</option>
+          </select>
+          <label for="fb">الميزانية التقريبية</label>
+        </div>
+
+        <div class="fg">
+          <textarea id="fm" name="msg" placeholder="x"></textarea>
+          <label for="fm">تفاصيل المشروع</label>
+        </div>
+
+        <button type="submit" class="fsub">إرسال الرسالة ←</button>
+        <p class="form-note">بالضغط على إرسال، سيُفتح واتساب مع تفاصيل رسالتك جاهزة للإرسال.</p>
+      </form>
+
+      <div class="form-success" id="form-success">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <h3>تم إرسال رسالتك!</h3>
+        <p>شكرًا لتواصلك معنا. سيرد فريقنا خلال ٢٤ ساعة.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- NEXT STEPS -->
+<section class="next-sec">
+  <div class="next-inner">
+    <div class="next-header">
+      <p class="next-eyebrow">ماذا يحدث بعد ذلك</p>
+      <h2 class="next-title">خطواتنا معك من اليوم الأول</h2>
+    </div>
+    <div class="next-grid">
+      <div class="next-step">
+        <span class="next-num">٠١</span>
+        <div class="next-step-title">نتواصل معك</div>
+        <p class="next-step-body">بعد استلام رسالتك، يتواصل معك أحد متخصصينا خلال ٢٤ ساعة لمناقشة احتياجاتك بالتفصيل.</p>
+      </div>
+      <div class="next-step">
+        <span class="next-num">٠٢</span>
+        <div class="next-step-title">معاينة مجانية</div>
+        <p class="next-step-body">نزور موقعك، نقيس، نفهم الفضاء، ونقدم لك عينات من الخامات المختارة لمشروعك تحديدًا.</p>
+      </div>
+      <div class="next-step">
+        <span class="next-num">٠٣</span>
+        <div class="next-step-title">عرض سعر واضح</div>
+        <p class="next-step-body">تصلك عروض أسعار مفصّلة وشفافة بلا تكاليف خفية، ومواعيد تسليم واضحة ومضمونة.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="port-foot">
+  <span>© ٢٠٢٥ مودرن آرت للجلود والتنجيد · القاهرة</span>
+  <a href="../">الصفحة الرئيسية</a>
+</footer>
+
+<script>
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('s', window.scrollY > 50);
+});
+document.getElementById('hbg').addEventListener('click',()=>document.getElementById('mnav').classList.toggle('open'));
+function closeMnav(){ document.getElementById('mnav').classList.remove('open'); }
+
+function submitContact(e) {
+  e.preventDefault();
+  const n = document.getElementById('fn').value;
+  const p = document.getElementById('fp').value;
+  const em = document.getElementById('fe').value;
+  const t = document.getElementById('ft').value;
+  const b = document.getElementById('fb').value;
+  const m = document.getElementById('fm').value;
+  const msg = `استفسار جديد\nالاسم: ${n}\nالهاتف: ${p}${em ? '\nالبريد: ' + em : ''}${t ? '\nنوع المشروع: ' + t : ''}${b ? '\nالميزانية: ' + b : ''}${m ? '\nالتفاصيل: ' + m : ''}`;
+  window.open(`https://wa.me/201008942666?text=${encodeURIComponent(msg)}`, '_blank');
+}
+</script>
+</body>
+</html>

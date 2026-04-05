@@ -91,9 +91,33 @@
   @keyframes spin { to { transform:rotate(360deg); } }
   
   .error-msg { color: #ff6b6b; font-size: 0.9rem; text-align: center; margin-top: 1rem; display: none; }
+
+  /* ---- Toast notifications ---- */
+  #toast-container{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);z-index:10000;display:flex;flex-direction:column-reverse;gap:.6rem;align-items:center;pointer-events:none;}
+  .toast{position:relative;overflow:hidden;background:rgba(30,18,10,.97);border:1px solid rgba(196,154,92,.22);color:var(--iv);padding:.85rem 1.3rem;border-radius:6px;font-family:'Tajawal',sans-serif;font-size:.88rem;display:flex;align-items:flex-start;gap:.75rem;min-width:290px;max-width:440px;box-shadow:0 8px 32px rgba(0,0,0,.5);pointer-events:all;animation:toastIn .3s cubic-bezier(.22,1,.36,1) forwards;}
+  .toast.out{animation:toastOut .28s ease forwards;}
+  @keyframes toastIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes toastOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(14px)}}
+  .toast-icon{font-size:1.1rem;flex-shrink:0;line-height:1.5;}
+  .toast-body{flex:1;direction:rtl;}
+  .toast-title{font-weight:600;margin-bottom:.15rem;line-height:1.4;}
+  .toast-sub{font-size:.76rem;color:rgba(245,237,216,.5);line-height:1.4;}
+  .toast.loading .toast-icon{display:inline-block;animation:spin 1s linear infinite;}
+  .toast.success{border-color:rgba(76,175,80,.35);}
+  .toast.error{border-color:rgba(255,107,107,.35);}
+  .toast-bar{position:absolute;bottom:0;left:0;height:2px;background:var(--dg);border-radius:0 2px 0 0;}
+
+  /* ---- Enhance checkbox ---- */
+  .enhance-row{display:flex;align-items:center;gap:.55rem;margin-top:.55rem;direction:rtl;}
+  .enhance-row input[type=checkbox]{width:15px;height:15px;accent-color:var(--dg);cursor:pointer;flex-shrink:0;}
+  .enhance-row label{font-size:.81rem;color:rgba(196,154,92,.7);cursor:pointer;user-select:none;display:flex;align-items:center;gap:.4rem;}
+  .enhance-row .ai-badge{background:rgba(196,154,92,.12);border:1px solid rgba(196,154,92,.28);color:var(--dg);font-size:.62rem;padding:.1rem .38rem;border-radius:3px;letter-spacing:.07em;font-weight:600;}
   </style>
 </head>
 <body>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
 
 <!-- Loading State -->
 <div class="loading-overlay" id="loader">
@@ -127,6 +151,7 @@
     <button class="tab-btn active" id="tab-portfolio" onclick="switchTab('portfolio')">Portfolio</button>
     <button class="tab-btn" id="tab-expertise" onclick="switchTab('expertise')">Expertise Services</button>
     <button class="tab-btn" id="tab-clients" onclick="switchTab('clients')">Clients / Partners</button>
+    <button class="tab-btn" id="tab-settings" onclick="switchTab('settings')">⚙ Site Settings</button>
   </div>
 
   <!-- Portfolio tab -->
@@ -150,6 +175,51 @@
     </div>
     <div class="svc-mgr-grid" id="clients-grid">
       <!-- Rendered via JS -->
+    </div>
+  </div>
+
+  <!-- Site Settings tab -->
+  <div id="pane-settings" style="display:none;">
+    <div class="ed-panel" style="max-width:680px;">
+      <h3 style="font-family:'Reem Kufi',sans-serif;color:var(--dg);margin-bottom:1.8rem;font-size:1.2rem;">إعدادات الموقع · Site Settings</h3>
+
+      <!-- Hero Video -->
+      <div class="form-group" style="margin-bottom:2rem;">
+        <label style="color:rgba(255,255,255,.7);font-size:.9rem;display:block;margin-bottom:.5rem;">
+          Hero Background Video URL
+          <span style="display:block;font-size:.75rem;color:rgba(255,255,255,.35);margin-top:.2rem;">The video that plays behind the text on the hero section. Paste a direct .mp4 link or upload to R2.</span>
+        </label>
+        <input type="url" id="s-hero-video" placeholder="https://...mp4" style="margin-bottom:.8rem;">
+        <!-- Upload helper -->
+        <div class="upload-box" style="margin-bottom:.8rem;">
+          <span style="color:var(--dg);font-size:.85rem;">أو ارفع ملف فيديو جديد · Or upload a new video file</span>
+          <input type="file" id="u-hero-video" accept="video/*" onchange="uploadHeroVideo(this)">
+          <p class="upload-status" id="st-hero-video">جاري الرفع...</p>
+        </div>
+        <!-- Preview -->
+        <video id="pv-hero-video" src="" controls muted style="width:100%;max-height:220px;border-radius:4px;border:1px solid rgba(196,154,92,.2);display:none;margin-bottom:.8rem;"></video>
+        <button class="btn-primary" onclick="saveHeroVideoUrl()" style="width:auto;padding:.7rem 2rem;">حفظ · Save</button>
+        <p id="settings-msg" style="font-size:.85rem;color:var(--dg);margin-top:.7rem;display:none;"></p>
+      </div>
+
+      <hr style="border:none;border-top:1px solid rgba(196,154,92,.12);margin:2rem 0;">
+
+      <!-- Story Image -->
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.7);font-size:.9rem;display:block;margin-bottom:.5rem;">
+          Our Story Section — Photo (قصتنا)
+          <span style="display:block;font-size:.75rem;color:rgba(255,255,255,.35);margin-top:.2rem;">The image displayed beside the brand story text on the homepage.</span>
+        </label>
+        <input type="url" id="s-story-image" placeholder="https://...jpg" style="margin-bottom:.8rem;">
+        <div class="upload-box" style="margin-bottom:.8rem;">
+          <span style="color:var(--dg);font-size:.85rem;">أو ارفع صورة جديدة · Or upload a new photo</span>
+          <input type="file" id="u-story-image" accept="image/*" onchange="uploadStoryImage(this)">
+          <p class="upload-status" id="st-story-image">جاري الرفع...</p>
+        </div>
+        <img id="pv-story-image" src="" alt="Story preview" style="width:100%;max-height:220px;object-fit:cover;border-radius:4px;border:1px solid rgba(196,154,92,.2);display:none;margin-bottom:.8rem;">
+        <button class="btn-primary" onclick="saveStoryImageUrl()" style="width:auto;padding:.7rem 2rem;">حفظ · Save</button>
+        <p id="story-img-msg" style="font-size:.85rem;color:var(--dg);margin-top:.7rem;display:none;"></p>
+      </div>
     </div>
   </div>
 </div>
@@ -233,6 +303,10 @@
             <input type="file" id="u-thumb" accept="image/*" onchange="uploadSingleFile(this, 'thumb')">
             <p class="upload-status" id="st-thumb">جاري الرفع...</p>
           </div>
+          <div class="enhance-row">
+            <input type="checkbox" id="enhance-thumb">
+            <label for="enhance-thumb">تحسين الصورة <span class="ai-badge">AI</span></label>
+          </div>
           <input type="hidden" id="f-thumb-url" required>
           <div class="img-preview-group" id="pv-thumb"></div>
         </div>
@@ -243,6 +317,10 @@
             <span style="color:var(--dg)">اسحب أو اضغط لرفع صورة إضافية</span>
             <input type="file" id="u-gallery" accept="image/*" onchange="uploadSingleFile(this, 'gallery')">
             <p class="upload-status" id="st-gallery">جاري الرفع...</p>
+          </div>
+          <div class="enhance-row">
+            <input type="checkbox" id="enhance-gallery">
+            <label for="enhance-gallery">تحسين الصورة <span class="ai-badge">AI</span></label>
           </div>
           <!-- We store JSON string here for submission -->
           <input type="hidden" id="f-gallery-urls" value="[]">
@@ -366,7 +444,36 @@ try {
   console.error("Supabase Init Error:", err);
 }
 
-const WEBHOOK_URL = 'https://primary-production-9e01d.up.railway.app/webhook/be3bfcdd-adb8-4fec-b2cb-91565ce8a23c';
+const WEBHOOK_URL         = 'https://primary-production-9e01d.up.railway.app/webhook/be3bfcdd-adb8-4fec-b2cb-91565ce8a23c';
+const ENHANCE_WEBHOOK_URL = 'https://primary-production-9e01d.up.railway.app/webhook/f0e1ccfa-a280-48a4-b6f4-7af09f1c87c0';
+
+/* ===== TOAST SYSTEM ===== */
+let _tid = 0;
+function showToast({ title, sub = '', type = 'info', duration = 4000, id = null }) {
+  const container = document.getElementById('toast-container');
+  const toastId = id || ('toast-' + (++_tid));
+  const existing = document.getElementById(toastId);
+  if (existing) { existing.classList.add('out'); setTimeout(() => existing.remove(), 280); }
+  const icons = { info: 'ℹ️', success: '✅', error: '❌', loading: '⏳', warning: '⚠️' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.id = toastId;
+  el.innerHTML = `
+    <span class="toast-icon">${icons[type] || 'ℹ️'}</span>
+    <div class="toast-body">
+      <div class="toast-title">${title}</div>
+      ${sub ? `<div class="toast-sub">${sub}</div>` : ''}
+    </div>`;
+  container.appendChild(el);
+  if (duration > 0) setTimeout(() => dismissToast(toastId), duration);
+  return toastId;
+}
+function dismissToast(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('out');
+  setTimeout(() => el.remove(), 280);
+}
 
 // State
 let projects = [];
@@ -544,53 +651,89 @@ async function deleteProject(id) {
 
 /* --- UPLOADER (Railway Webhook) --- */
 async function uploadSingleFile(inputEl, type) {
-  if(!inputEl.files || !inputEl.files[0]) return;
+  if (!inputEl.files || !inputEl.files[0]) return;
   const file = inputEl.files[0];
-  
-  const stEl = document.getElementById(type === 'thumb' ? 'st-thumb' : 'st-gallery');
+
+  const stEl    = document.getElementById(type === 'thumb' ? 'st-thumb'   : 'st-gallery');
+  const enhance = document.getElementById(type === 'thumb' ? 'enhance-thumb' : 'enhance-gallery')?.checked;
+
   stEl.style.display = 'block';
-  stEl.textContent = 'جاري الرفع...';
-  stEl.style.color = 'var(--dg)';
-  
+  stEl.style.color   = 'var(--dg)';
+
+  // AbortController — 3-minute timeout
+  const controller = new AbortController();
+  const hardTimeout = setTimeout(() => controller.abort(), 180000);
+  let activeToastId = null;
+
   try {
+    if (enhance) {
+      stEl.textContent = '⏳ جاري تحسين الصورة... (٣٠-٤٠ ثانية)';
+      activeToastId = showToast({
+        title: 'جاري تحسين الصورة بالذكاء الاصطناعي',
+        sub: 'قد يستغرق ٣٠-٤٠ ثانية — يرجى الانتظار',
+        type: 'loading',
+        duration: 0,
+        id: 'enhance-upload-toast'
+      });
+    } else {
+      stEl.textContent = 'جاري الرفع...';
+    }
+
     const fd = new FormData();
     fd.append('file', file);
     fd.append('filename', file.name);
-    
-    // Hit Railway webhook
-    const res = await fetch(WEBHOOK_URL, {
+
+    const res = await fetch(enhance ? ENHANCE_WEBHOOK_URL : WEBHOOK_URL, {
       method: 'POST',
-      body: fd
+      body: fd,
+      signal: controller.signal
     });
-    
-    if(!res.ok) throw new Error("Upload Failed");
-    
-    // User noted webhook returns {"link":"r2linkhere"}
+
+    clearTimeout(hardTimeout);
+    if (!res.ok) throw new Error(`فشل الطلب — ${res.status}`);
+
     const json = await res.json();
     const finalUrl = json.link;
-    
-    if(!finalUrl) throw new Error("Webhook did not return a valid link property.");
-    
-    // Handle UI placement
-    if(type === 'thumb') {
+    if (!finalUrl) throw new Error('لم يرجع الـ webhook رابطًا صحيحًا');
+
+    // Place result
+    if (type === 'thumb') {
       document.getElementById('f-thumb-url').value = finalUrl;
       document.getElementById('pv-thumb').innerHTML = `<img src="${finalUrl}">`;
     } else {
       galleryArray.push(finalUrl);
       updateGalleryInput();
     }
-    
-    stEl.textContent = 'تم الرفع بنجاح ✓';
+
+    stEl.textContent = enhance ? 'تم التحسين والرفع بنجاح ✓' : 'تم الرفع بنجاح ✓';
     stEl.style.color = '#4CAF50';
-    setTimeout(()=> stEl.style.display='none', 3000);
-    
-  } catch(err) {
-    stEl.textContent = 'فشل الرفع!';
+    setTimeout(() => stEl.style.display = 'none', 3000);
+
+    if (activeToastId) dismissToast(activeToastId);
+    showToast({
+      title: enhance ? 'تم تحسين الصورة ورفعها بنجاح ✓' : 'تم الرفع بنجاح ✓',
+      type: 'success',
+      duration: 5000
+    });
+
+  } catch (err) {
+    clearTimeout(hardTimeout);
+    if (activeToastId) dismissToast(activeToastId);
+
+    const isAbort = err.name === 'AbortError';
+    stEl.textContent = isAbort ? 'انتهت مهلة الاتصال (٣ دقائق)' : 'فشل الرفع!';
     stEl.style.color = '#ff6b6b';
+
+    showToast({
+      title: isAbort ? 'انتهت مهلة الاتصال' : 'فشل الرفع',
+      sub: isAbort ? 'استغرقت العملية أكثر من ٣ دقائق — حاول مجددًا' : err.message,
+      type: 'error',
+      duration: 7000
+    });
+
     console.error(err);
   }
-  
-  // Clear file input so same file can be selected again if needed
+
   inputEl.value = '';
 }
 
@@ -617,15 +760,18 @@ function switchTab(tab) {
   currentTab = tab;
   document.getElementById('pane-portfolio').style.display = tab === 'portfolio' ? '' : 'none';
   document.getElementById('pane-expertise').style.display = tab === 'expertise' ? '' : 'none';
-  document.getElementById('pane-clients').style.display = tab === 'clients' ? '' : 'none';
-  
+  document.getElementById('pane-clients').style.display   = tab === 'clients'   ? '' : 'none';
+  document.getElementById('pane-settings').style.display  = tab === 'settings'  ? '' : 'none';
+
   document.getElementById('btn-add-project').style.display = tab === 'portfolio' ? '' : 'none';
   document.getElementById('tab-portfolio').classList.toggle('active', tab === 'portfolio');
   document.getElementById('tab-expertise').classList.toggle('active', tab === 'expertise');
   document.getElementById('tab-clients').classList.toggle('active', tab === 'clients');
-  
+  document.getElementById('tab-settings').classList.toggle('active', tab === 'settings');
+
   if (tab === 'expertise') loadExpertiseServices();
-  if (tab === 'clients') loadClients();
+  if (tab === 'clients')   loadClients();
+  if (tab === 'settings')  loadSiteSettings();
 }
 
 /* ===================================================================
@@ -873,6 +1019,136 @@ async function uploadClientImage(inputEl) {
     stEl.textContent = 'فشل الرفع!';
     stEl.style.color = '#ff6b6b';
     console.error(err);
+  }
+  inputEl.value = '';
+}
+
+/* ===================================================================
+   SITE SETTINGS
+=================================================================== */
+async function loadSiteSettings() {
+  try {
+    const { data, error } = await supaClient
+      .from('site_settings')
+      .select('key, value')
+      .in('key', ['hero_video_url', 'story_image_url']);
+    if (error) throw error;
+    (data || []).forEach(({ key, value }) => {
+      if (!value) return;
+      if (key === 'hero_video_url') {
+        document.getElementById('s-hero-video').value = value;
+        const pv = document.getElementById('pv-hero-video');
+        pv.src = value; pv.style.display = 'block';
+      }
+      if (key === 'story_image_url') {
+        document.getElementById('s-story-image').value = value;
+        const pv = document.getElementById('pv-story-image');
+        pv.src = value; pv.style.display = 'block';
+      }
+    });
+  } catch(e) {
+    console.error('loadSiteSettings:', e);
+  }
+}
+
+async function saveHeroVideoUrl() {
+  const url = document.getElementById('s-hero-video').value.trim();
+  if (!url) return;
+  const msg = document.getElementById('settings-msg');
+  msg.style.display = 'none';
+  try {
+    const { error } = await supaClient
+      .from('site_settings')
+      .upsert({ key: 'hero_video_url', value: url, label: 'Hero Background Video URL', updated_at: new Date().toISOString() }, { onConflict: 'key' });
+    if (error) throw error;
+    const pv = document.getElementById('pv-hero-video');
+    pv.src = url; pv.style.display = 'block';
+    msg.textContent = '✓ تم الحفظ بنجاح · Saved successfully';
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 3000);
+  } catch(e) {
+    msg.textContent = '✗ خطأ أثناء الحفظ · Error saving: ' + e.message;
+    msg.style.display = 'block';
+  }
+}
+
+async function saveStoryImageUrl() {
+  const url = document.getElementById('s-story-image').value.trim();
+  if (!url) return;
+  const msg = document.getElementById('story-img-msg');
+  msg.style.display = 'none';
+  try {
+    const { error } = await supaClient
+      .from('site_settings')
+      .upsert({ key: 'story_image_url', value: url, label: 'Our Story Section — Photo', updated_at: new Date().toISOString() }, { onConflict: 'key' });
+    if (error) throw error;
+    const pv = document.getElementById('pv-story-image');
+    pv.src = url; pv.style.display = 'block';
+    msg.textContent = '✓ تم الحفظ بنجاح · Saved successfully';
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 3000);
+  } catch(e) {
+    msg.textContent = '✗ خطأ أثناء الحفظ · Error saving: ' + e.message;
+    msg.style.display = 'block';
+  }
+}
+
+async function uploadStoryImage(inputEl) {
+  const file = inputEl.files[0];
+  if (!file) return;
+  const st = document.getElementById('st-story-image');
+  st.style.display = 'block';
+  st.textContent = 'جاري الرفع...';
+  st.style.color = 'var(--dg)';
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('filename', file.name);
+    const res = await fetch(WEBHOOK_URL, { method: 'POST', body: fd });
+    if (!res.ok) throw new Error('Upload Failed');
+    const json = await res.json();
+    const finalUrl = json.link;
+    if (!finalUrl) throw new Error('No link returned');
+    document.getElementById('s-story-image').value = finalUrl;
+    const pv = document.getElementById('pv-story-image');
+    pv.src = finalUrl; pv.style.display = 'block';
+    st.textContent = 'تم الرفع بنجاح ✓';
+    st.style.color = '#4CAF50';
+    setTimeout(() => st.style.display = 'none', 3000);
+  } catch(e) {
+    st.textContent = 'فشل الرفع!';
+    st.style.color = '#ff6b6b';
+    console.error(e);
+  }
+  inputEl.value = '';
+}
+
+async function uploadHeroVideo(inputEl) {
+  const file = inputEl.files[0];
+  if (!file) return;
+  const st = document.getElementById('st-hero-video');
+  st.style.display = 'block';
+  st.textContent = 'جاري الرفع...';
+  st.style.color = 'var(--dg)';
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('filename', file.name);
+    const res = await fetch(WEBHOOK_URL, { method: 'POST', body: fd });
+    if (!res.ok) throw new Error('Upload Failed');
+    const json = await res.json();
+    const finalUrl = json.link;
+    if (!finalUrl) throw new Error('No link returned');
+    document.getElementById('s-hero-video').value = finalUrl;
+    const pv = document.getElementById('pv-hero-video');
+    pv.src = finalUrl; pv.style.display = 'block';
+    st.textContent = 'تم الرفع بنجاح ✓';
+    st.style.color = '#4CAF50';
+    setTimeout(() => st.style.display = 'none', 3000);
+  } catch(e) {
+    st.textContent = 'فشل الرفع!';
+    st.style.color = '#ff6b6b';
+    console.error(e);
   }
   inputEl.value = '';
 }
