@@ -2,6 +2,20 @@
 -- SUPABASE SCHEMA: portfolio_projects (ENGLISH EXPANSION)
 -- ==========================================
 
+-- ==========================================
+-- gallery_photos — standalone photo gallery
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.gallery_photos (
+    id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    url         TEXT NOT NULL,
+    caption_ar  TEXT DEFAULT '',
+    caption_en  TEXT DEFAULT '',
+    sort_order  INTEGER DEFAULT 0,
+    created_at  TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_gallery_sort ON public.gallery_photos (sort_order ASC, created_at DESC);
+
+
 -- 1. Create the table
 CREATE TABLE IF NOT EXISTS public.portfolio_projects (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -18,8 +32,15 @@ CREATE TABLE IF NOT EXISTS public.portfolio_projects (
     solution_en TEXT,
     thumb TEXT NOT NULL,
     images JSONB DEFAULT '[]'::jsonb,
+    sort_order INTEGER DEFAULT 0,
+    featured BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- 2. Migration: add columns to existing table if not already present
+ALTER TABLE public.portfolio_projects ADD COLUMN IF NOT EXISTS sort_order INTEGER DEFAULT 0;
+ALTER TABLE public.portfolio_projects ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT true;
+CREATE INDEX IF NOT EXISTS idx_portfolio_sort ON public.portfolio_projects (sort_order ASC, created_at DESC);
 
 -- 3. Insert Dummy Data (With English Translations)
 INSERT INTO public.portfolio_projects (
@@ -46,8 +67,8 @@ INSERT INTO public.portfolio_projects (
     'Exhibition Booth',
     'معرض القاهرة الدولي',
     'Cairo International Exhibition',
-    'جلد صناعي فاخر مقوى',
-    'Reinforced Luxury Faux Leather',
+    'جلد طبيعي فاخر مقوى',
+    'Reinforced Luxury Natural Leather',
     'تجهيز جناح عرض بمساحة ٥٠ متراً مربعاً وتكسية جميع جدرانه وحوامل العرض بالجلد خلال ٤٨ ساعة فقط ليتوافق مع موعد الافتتاح الرسمي.',
     'Outfitting a 50-square-meter exhibition booth by cladding all walls and display stands in leather within a strict 48-hour window before the official opening.',
     'تم تصنيع ألواح الجلد (Panels) مسبقاً في الورشة بأبعاد الجناح الدقيقة مع أنظمة تثبيت مخفية. اقتصر العمل في الموقع على التجميع الذي لم يستغرق سوى ١٢ ساعة لضمان الجودة العالية.',
@@ -121,8 +142,8 @@ INSERT INTO public.portfolio_projects (
     'Restaurant Seating',
     'مطعم ريڤيرا التجمع الأول',
     'Riviera Restaurant, New Cairo',
-    'جلد صناعي مضاد للبكتيريا والبقع',
-    'Anti-bacterial & Stain-Resistant Faux Leather',
+    'جلد طبيعي مضاد للبكتيريا والبقع',
+    'Anti-bacterial & Stain-Resistant Natural Leather',
     'تصنيع أرائك جلوس متصلة مريحة جداً وتتحمل انسكاب الطعام والمشروبات اليومي، مع الحفاظ على مظهر كلاسيكي فاخر.',
     'Crafting deeply comfortable, continuous banquette seating capable of surviving daily heavy food and beverage spills, while projecting a classic, incredibly majestic dining aesthetic.',
     'اخترنا جلود مميزة بتكنولوجيا Nano-coating التي لا تمتص السوائل، وزودنا المقاعد بطبقات إسفنج متعددة الكثافة للراحة لساعات طويلة.',

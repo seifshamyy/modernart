@@ -125,30 +125,30 @@
 
   /* ===== GALLERY ===== */
   .gallery-wrap{max-width:1440px;margin:0 auto;padding:0 2rem}
-  .pg-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
-    grid-auto-rows:260px;gap:1rem;grid-auto-flow:dense;
+  .pg-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:260px;gap:5px;grid-auto-flow:dense}
+  .pg-item{position:relative;overflow:hidden;background:var(--hn);cursor:zoom-in}
+  .pg-item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.86) saturate(1.08);transition:transform 1.5s var(--ease),filter .6s var(--ease)}
+  .pg-item:hover img{transform:scale(1.06);filter:brightness(.96) saturate(1.12)}
+  .pg-item:nth-child(7n+1){grid-column:span 2;grid-row:span 2}
+  .pg-item:nth-child(7n+4){grid-row:span 2}
+  .pg-item:nth-child(7n+6){grid-column:span 2}
+  .pg-cap{position:absolute;bottom:0;left:0;right:0;padding:.7rem 1rem;background:linear-gradient(to top,rgba(26,17,11,.75) 0%,transparent 100%)}
+  .pg-ar{font-family:'Reem Kufi',sans-serif;font-size:.8rem;color:rgba(235,210,170,.92);line-height:1.3}
+  /* Lightbox */
+  #gl-lb{position:fixed;inset:0;z-index:9000;background:rgba(14,9,6,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s ease;cursor:zoom-out;padding:2rem}
+  #gl-lb.open{opacity:1;pointer-events:all}
+  #gl-lb-img{max-width:92vw;max-height:84vh;object-fit:contain;display:block}
+  #gl-lb-cap{font-family:'Cormorant Garamond',serif;color:rgba(235,210,170,.6);margin-top:1.2rem;font-size:.9rem;letter-spacing:.08em;text-align:center}
+  @media(max-width:1024px){.pg-grid{grid-template-columns:repeat(3,1fr);grid-auto-rows:220px}}
+  @media(max-width:768px){
+    .pg-grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:185px;gap:4px}
+    .pg-item:nth-child(7n+1){grid-column:span 2;grid-row:span 1}
+    .pg-item:nth-child(7n+6){grid-column:span 2}
   }
-  .pg-item{position:relative;overflow:hidden;background:var(--hn);cursor:pointer;border-radius:2px}
-  .pg-item img{
-    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-    filter:sepia(.08) saturate(1.1) brightness(.8);
-    transition:transform 1.4s var(--ease),filter .6s var(--ease);
+  @media(max-width:480px){
+    .pg-grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:150px;gap:3px}
+    .pg-item:nth-child(n){grid-column:span 1!important;grid-row:span 1!important}
   }
-  .pg-item:hover img{transform:scale(1.05);filter:sepia(.04) saturate(1.15) brightness(.92)}
-  .pg-cap{
-    position:absolute;bottom:0;left:0;right:0;
-    padding:3.5rem 1.4rem 1.2rem;
-    background:linear-gradient(to top,rgba(26,17,11,.97) 0%,rgba(26,17,11,.6) 50%,transparent 100%);
-    transition:padding .4s var(--ease);
-  }
-  .pg-item:hover .pg-cap{padding-bottom:1.7rem}
-  .pg-ar{font-family:'Reem Kufi',sans-serif;font-size:1.1rem;color:var(--iv);margin-bottom:.15rem;line-height:1.3}
-  .pg-en{font-family:'Cormorant Garamond',serif;font-size:.68rem;font-weight:300;letter-spacing:.2em;color:var(--dg);text-transform:uppercase}
-  .pg-client{font-family:'Tajawal',sans-serif;font-size:.6rem;color:rgba(232,213,168,.45);margin-top:.35rem;border-top:1px solid rgba(196,154,92,.18);padding-top:.35rem;display:inline-block}
-  .pg-item.tall{grid-row:span 2}
-  .pg-item.wide{grid-column:span 2}
 
   /* ===== CRAFT INTERLUDE ===== */
   .craft-sec{
@@ -370,7 +370,7 @@
 <div class="sec-label">
   <p class="sl-eyebrow">المجموعة الكاملة</p>
   <h2 class="sl-title">أعمال تتحدث عن نفسها</h2>
-  <p class="sl-body">اضغط على أي مشروع للاطلاع على تفاصيله — الخامات المستخدمة، التحدي، والحل الذي قدّمناه.</p>
+  <p class="sl-body">اضغط على أي صورة لعرضها بالحجم الكامل.</p>
 </div>
 
 <!-- ══════════ GALLERY ══════════ -->
@@ -422,36 +422,6 @@
   <a href="../">الصفحة الرئيسية</a>
 </footer>
 
-<!-- ══════════ MODAL ══════════ -->
-<div id="pm-ov" role="dialog" aria-modal="true">
-  <div id="pm">
-    <button class="pm-close" id="pm-close-btn" aria-label="إغلاق">✕</button>
-    <div class="pm-visual">
-      <div class="pm-hero"><img id="pm-hero-img" src="" alt="Hero"></div>
-      <div class="pm-thumbs" id="pm-thumbs-container"></div>
-    </div>
-    <div class="pm-details">
-      <p class="pm-client" id="pm-client"></p>
-      <h2 class="pm-title" id="pm-title"></h2>
-      <p class="pm-en" id="pm-en"></p>
-      <div class="pm-block">
-        <p class="pm-lbl">الخامات المستخدمة</p>
-        <p class="pm-txt" id="pm-materials"></p>
-      </div>
-      <div class="pm-block">
-        <p class="pm-lbl">تحدي المشروع</p>
-        <p class="pm-txt" id="pm-challenge"></p>
-      </div>
-      <div class="pm-block">
-        <p class="pm-lbl">النتيجة والحل</p>
-        <p class="pm-txt" id="pm-solution"></p>
-      </div>
-      <a href="../contact/" class="cta-primary" style="margin-top:1rem">لنتحدث عن مشروعك ←</a>
-    </div>
-  </div>
-</div>
-
-<script src="../portfolio-data.js"></script>
 <script>
 window.addEventListener('scroll',()=>{
   document.getElementById('nav').classList.toggle('s', window.scrollY > 50);
@@ -459,80 +429,40 @@ window.addEventListener('scroll',()=>{
 document.getElementById('hbg').addEventListener('click',()=>document.getElementById('mnav').classList.toggle('open'));
 function closeMnav(){ document.getElementById('mnav').classList.remove('open'); }
 
-let globalPortfolioData = [];
+/* Lightbox */
+(function(){
+  const lb = document.createElement('div');
+  lb.id = 'gl-lb';
+  lb.innerHTML = '<img id="gl-lb-img" alt=""><p id="gl-lb-cap"></p>';
+  document.body.appendChild(lb);
+  lb.addEventListener('click', () => lb.classList.remove('open'));
+  document.addEventListener('keydown', e => { if(e.key==='Escape') lb.classList.remove('open'); });
+})();
+function openLightbox(url, cap) {
+  document.getElementById('gl-lb-img').src = url;
+  document.getElementById('gl-lb-cap').textContent = cap || '';
+  document.getElementById('gl-lb').classList.add('open');
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
   const grid = document.getElementById('portfolio-grid');
   if(!grid) return;
   try {
-    const res = await fetch('https://whmbrguzumyatnslzfsq.supabase.co/rest/v1/portfolio_projects?select=*&order=created_at.desc', {
+    const res = await fetch('https://whmbrguzumyatnslzfsq.supabase.co/rest/v1/gallery_photos?select=id,url,caption_ar&order=sort_order.asc,created_at.desc', {
       headers: {
         'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndobWJyZ3V6dW15YXRuc2x6ZnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzNTE2ODksImV4cCI6MjA2NDkyNzY4OX0.xcSogaAHv8uQzhFgEDZ1niFx8lirLiBRvkPpMF174YM',
         'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndobWJyZ3V6dW15YXRuc2x6ZnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzNTE2ODksImV4cCI6MjA2NDkyNzY4OX0.xcSogaAHv8uQzhFgEDZ1niFx8lirLiBRvkPpMF174YM'
       }
     });
-    if(!res.ok) throw new Error("Supabase error");
-    globalPortfolioData = await res.json();
-
-    grid.innerHTML = globalPortfolioData.map((item, i) => {
-      let cls = "";
-      if(i % 5 === 0) cls = "wide";
-      else if(i % 3 === 0) cls = "tall";
-      return `
-        <div class="pg-item ${cls}" onclick="openProjectModal('${item.id}')">
-          <img src="${item.thumb}" alt="${item.title_en}" loading="lazy">
-          <div class="pg-cap">
-            <p class="pg-ar">${item.title_ar}</p>
-            <p class="pg-en">${item.title_en}</p>
-            <span class="pg-client">${item.client || ''}</span>
-          </div>
-        </div>`;
-    }).join('');
-
-    const p = new URLSearchParams(window.location.search).get('project');
-    if(p) setTimeout(() => openProjectModal(p), 300);
-  } catch(e) {
-    console.error("Gallery error:", e);
-  }
+    if(!res.ok) throw new Error("error");
+    const photos = await res.json();
+    grid.innerHTML = photos.map(p => `
+      <div class="pg-item" onclick="openLightbox('${p.url.replace(/'/g,"\\'")}','${(p.caption_ar||'').replace(/'/g,"\\'")}')">
+        <img src="${p.url}" alt="${p.caption_ar||''}" loading="lazy">
+        ${p.caption_ar?`<div class="pg-cap"><p class="pg-ar">${p.caption_ar}</p></div>`:''}
+      </div>`).join('');
+  } catch(e) { console.error("Gallery error:", e); }
 });
-
-const pmOv = document.getElementById('pm-ov');
-const heroImg = document.getElementById('pm-hero-img');
-const thumbsCon = document.getElementById('pm-thumbs-container');
-
-function openProjectModal(id) {
-  const data = globalPortfolioData.find(p => p.id === id) || globalPortfolioData[0];
-  if(!data) return;
-  document.getElementById('pm-client').textContent = data.client || '';
-  document.getElementById('pm-title').textContent = data.title_ar;
-  document.getElementById('pm-en').textContent = data.title_en;
-  document.getElementById('pm-materials').textContent = data.materials || '';
-  document.getElementById('pm-challenge').textContent = data.challenge || '';
-  document.getElementById('pm-solution').textContent = data.solution || '';
-  const imgs = (data.images && data.images.length > 0) ? data.images : [data.thumb];
-  heroImg.src = imgs[0];
-  thumbsCon.innerHTML = imgs.map((url, i) =>
-    `<img src="${url}" class="pm-thumb ${i===0?'active':''}" onclick="setHeroImage(this,'${url}')">`
-  ).join('');
-  pmOv.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function setHeroImage(el, url) {
-  heroImg.style.opacity = '0';
-  setTimeout(() => { heroImg.src = url; heroImg.style.opacity = '1'; }, 300);
-  document.querySelectorAll('.pm-thumb').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-}
-
-function closeProjectModal() {
-  pmOv.classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-document.getElementById('pm-close-btn').addEventListener('click', closeProjectModal);
-pmOv.addEventListener('click', e => { if(e.target === pmOv) closeProjectModal(); });
-document.addEventListener('keydown', e => { if(e.key === 'Escape') closeProjectModal(); });
 </script>
 </body>
 </html>

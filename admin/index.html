@@ -152,6 +152,7 @@
     <button class="tab-btn" id="tab-expertise" onclick="switchTab('expertise')">Expertise Services</button>
     <button class="tab-btn" id="tab-clients" onclick="switchTab('clients')">Clients / Partners</button>
     <button class="tab-btn" id="tab-settings" onclick="switchTab('settings')">⚙ Site Settings</button>
+    <button class="tab-btn" id="tab-gallery" onclick="switchTab('gallery')">📷 Gallery Photos</button>
   </div>
 
   <!-- Portfolio tab -->
@@ -179,6 +180,43 @@
   </div>
 
   <!-- Site Settings tab -->
+  <!-- Gallery Photos tab -->
+  <div id="pane-gallery" style="display:none;">
+    <div class="ed-panel" style="max-width:760px;margin-bottom:2rem;">
+      <h3 style="font-family:'Reem Kufi',sans-serif;color:var(--dg);margin-bottom:1.5rem;font-size:1.1rem;">إضافة صورة · Add Photo</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1rem;">
+        <div class="form-group">
+          <label>التسمية بالعربي</label>
+          <input type="text" id="gp-cap-ar" placeholder="وصف الصورة بالعربي">
+        </div>
+        <div class="form-group" dir="ltr">
+          <label>Caption (English)</label>
+          <input type="text" id="gp-cap-en" placeholder="Image caption in English">
+        </div>
+      </div>
+      <div style="display:flex;gap:1.2rem;align-items:flex-end;margin-bottom:1.2rem;">
+        <div class="form-group" style="width:120px;flex-shrink:0;">
+          <label>ترتيب العرض</label>
+          <input type="number" id="gp-order" value="0" min="0">
+        </div>
+        <div style="flex:1;">
+          <div class="upload-box">
+            <span style="color:var(--dg)">اسحب أو اضغط لرفع الصورة</span>
+            <input type="file" id="gp-file" accept="image/*" onchange="uploadGalleryPhoto(this)">
+            <p class="upload-status" id="gp-st" style="display:none;">جاري الرفع...</p>
+          </div>
+          <div class="enhance-row">
+            <input type="checkbox" id="gp-enhance">
+            <label for="gp-enhance">تحسين بالذكاء الاصطناعي <span class="ai-badge">AI</span></label>
+          </div>
+          <input type="hidden" id="gp-url">
+        </div>
+      </div>
+      <button class="btn-primary" onclick="saveGalleryPhoto()" style="width:100%;padding:.9rem;font-size:1rem;">إضافة الصورة للمعرض</button>
+    </div>
+    <div class="p-grid" id="gallery-photos-grid"><!-- Rendered via JS --></div>
+  </div>
+
   <div id="pane-settings" style="display:none;">
     <div class="ed-panel" style="max-width:680px;">
       <h3 style="font-family:'Reem Kufi',sans-serif;color:var(--dg);margin-bottom:1.8rem;font-size:1.2rem;">إعدادات الموقع · Site Settings</h3>
@@ -240,6 +278,16 @@
         <div class="form-group">
           <label>المعرف (Slug) - إنجليزي بدون مسافات، يفضل أن يكون فريداً</label>
           <input type="text" id="f-slug" required placeholder="e.g. hotel-chair-01">
+        </div>
+        <div class="form-group" style="display:flex;gap:1.5rem;align-items:flex-end;margin-bottom:1rem;">
+          <div style="flex:1">
+            <label>ترتيب العرض — رقم أصغر يعني يظهر أولاً في المعرض</label>
+            <input type="number" id="f-sort-order" value="0" min="0" style="width:100%">
+          </div>
+          <div style="display:flex;align-items:center;gap:.6rem;padding-bottom:.35rem;white-space:nowrap">
+            <input type="checkbox" id="f-featured" checked style="width:16px;height:16px;cursor:pointer;accent-color:var(--dg)">
+            <label for="f-featured" style="cursor:pointer;font-size:.9rem">ظاهر في معرض الصفحة الرئيسية</label>
+          </div>
         </div>
         <div style="display:flex;gap:1.5rem;">
           <!-- Arabic Flow -->
@@ -593,7 +641,9 @@ function editProject(id) {
   
   document.getElementById('f-thumb-url').value = p.thumb;
   document.getElementById('pv-thumb').innerHTML = `<img src="${p.thumb}">`;
-  
+  document.getElementById('f-sort-order').value = p.sort_order ?? 0;
+  document.getElementById('f-featured').checked = p.featured !== false;
+
   galleryArray = p.images || [];
   updateGalleryInput();
   
@@ -620,7 +670,9 @@ async function saveProject(e) {
     solution_en: document.getElementById('f-solution-en').value.trim(),
     
     thumb: document.getElementById('f-thumb-url').value,
-    images: galleryArray
+    images: galleryArray,
+    sort_order: parseInt(document.getElementById('f-sort-order').value) || 0,
+    featured: document.getElementById('f-featured').checked
   };
   
   const id = document.getElementById('f-id').value;
@@ -753,6 +805,100 @@ function removeGalleryImg(index) {
 }
 
 /* ===================================================================
+   GALLERY PHOTOS CRUD
+=================================================================== */
+let galleryPhotos = [];
+
+async function loadGalleryPhotos() {
+  showLoading('جاري جلب الصور...');
+  const { data, error } = await supaClient
+    .from('gallery_photos')
+    .select('*')
+    .order('sort_order', { ascending: true });
+  hideLoading();
+  if(error) { alert('Error: ' + error.message); return; }
+  galleryPhotos = data || [];
+  renderGalleryPhotosGrid();
+}
+
+function renderGalleryPhotosGrid() {
+  const grid = document.getElementById('gallery-photos-grid');
+  if(!galleryPhotos.length) {
+    grid.innerHTML = '<p style="color:rgba(255,255,255,.4);padding:2rem;">لا توجد صور بعد. ارفع أول صورة من الأعلى.</p>';
+    return;
+  }
+  grid.innerHTML = galleryPhotos.map(p => `
+    <div class="p-card">
+      <img src="${p.url}" alt="${p.caption_ar||''}">
+      <div class="p-card-body">
+        <h3 class="p-title">${p.caption_ar || '—'}</h3>
+        <p class="p-slug" style="direction:ltr;">${p.caption_en || '—'}</p>
+        <p class="p-slug" style="font-size:.75rem;opacity:.5;">Sort: ${p.sort_order}</p>
+        <div class="p-actions">
+          <button class="btn-sm btn-del" onclick="deleteGalleryPhoto('${p.id}')">حذف</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function saveGalleryPhoto() {
+  const url = document.getElementById('gp-url').value;
+  if(!url) { alert('يرجى رفع صورة أولاً'); return; }
+  const payload = {
+    url,
+    caption_ar: document.getElementById('gp-cap-ar').value.trim(),
+    caption_en: document.getElementById('gp-cap-en').value.trim(),
+    sort_order: parseInt(document.getElementById('gp-order').value) || 0
+  };
+  showLoading('جاري الإضافة...');
+  const { error } = await supaClient.from('gallery_photos').insert([payload]);
+  hideLoading();
+  if(error) { alert('Error: ' + error.message); return; }
+  document.getElementById('gp-url').value = '';
+  document.getElementById('gp-cap-ar').value = '';
+  document.getElementById('gp-cap-en').value = '';
+  document.getElementById('gp-order').value = '0';
+  document.getElementById('gp-st').style.display = 'none';
+  showToast({ title: 'تمت إضافة الصورة ✓', type: 'success', duration: 4000 });
+  loadGalleryPhotos();
+}
+
+async function deleteGalleryPhoto(id) {
+  if(!confirm('حذف هذه الصورة نهائياً؟')) return;
+  showLoading('جاري الحذف...');
+  const { error } = await supaClient.from('gallery_photos').delete().eq('id', id);
+  hideLoading();
+  if(error) { alert('Error: ' + error.message); return; }
+  loadGalleryPhotos();
+}
+
+async function uploadGalleryPhoto(inputEl) {
+  if(!inputEl.files || !inputEl.files[0]) return;
+  const file = inputEl.files[0];
+  const stEl = document.getElementById('gp-st');
+  const enhance = document.getElementById('gp-enhance').checked;
+  stEl.style.display = 'block';
+  stEl.style.color = 'var(--dg)';
+  stEl.textContent = enhance ? '⏳ جاري التحسين...' : 'جاري الرفع...';
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('filename', file.name);
+    const res = await fetch(enhance ? ENHANCE_WEBHOOK_URL : WEBHOOK_URL, { method: 'POST', body: fd });
+    if(!res.ok) throw new Error('فشل الرفع');
+    const json = await res.json();
+    if(!json.link) throw new Error('لم يرجع رابط');
+    document.getElementById('gp-url').value = json.link;
+    stEl.textContent = 'تم الرفع ✓';
+    stEl.style.color = '#4CAF50';
+  } catch(err) {
+    stEl.textContent = 'فشل الرفع!';
+    stEl.style.color = '#ff6b6b';
+  }
+  inputEl.value = '';
+}
+
+/* ===================================================================
    TAB SWITCHING
 =================================================================== */
 let currentTab = 'portfolio';
@@ -762,16 +908,19 @@ function switchTab(tab) {
   document.getElementById('pane-expertise').style.display = tab === 'expertise' ? '' : 'none';
   document.getElementById('pane-clients').style.display   = tab === 'clients'   ? '' : 'none';
   document.getElementById('pane-settings').style.display  = tab === 'settings'  ? '' : 'none';
+  document.getElementById('pane-gallery').style.display   = tab === 'gallery'   ? '' : 'none';
 
   document.getElementById('btn-add-project').style.display = tab === 'portfolio' ? '' : 'none';
   document.getElementById('tab-portfolio').classList.toggle('active', tab === 'portfolio');
   document.getElementById('tab-expertise').classList.toggle('active', tab === 'expertise');
   document.getElementById('tab-clients').classList.toggle('active', tab === 'clients');
   document.getElementById('tab-settings').classList.toggle('active', tab === 'settings');
+  document.getElementById('tab-gallery').classList.toggle('active', tab === 'gallery');
 
   if (tab === 'expertise') loadExpertiseServices();
   if (tab === 'clients')   loadClients();
   if (tab === 'settings')  loadSiteSettings();
+  if (tab === 'gallery')   loadGalleryPhotos();
 }
 
 /* ===================================================================

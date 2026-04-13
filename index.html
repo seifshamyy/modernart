@@ -245,21 +245,29 @@
   .work-intro{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:3rem;gap:2rem}
   .work-intro p{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;color:rgba(44,24,16,.6);max-width:380px;line-height:1.8}
 
-  /* Masonry grid */
-  .work-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:62px;gap:10px}
-  .wi{position:relative;overflow:hidden;background:var(--hn)}
-  .wi:nth-child(1){grid-column:span 7;grid-row:span 6}
-  .wi:nth-child(2){grid-column:span 5;grid-row:span 4}
-  .wi:nth-child(3){grid-column:span 5;grid-row:span 5}
-  .wi:nth-child(4){grid-column:span 4;grid-row:span 4}
-  .wi:nth-child(5){grid-column:span 3;grid-row:span 4}
-  .wi:nth-child(6){grid-column:span 5;grid-row:span 5}
-  .wi img{width:100%;height:100%;object-fit:cover;filter:sepia(.06) saturate(1.1) brightness(.92);transition:transform 1.3s var(--ease)}
-  .wi:hover img{transform:scale(1.04)}
-  .wi-cap{position:absolute;bottom:0;left:0;right:0;padding:1.5rem 1.2rem;background:linear-gradient(to top,rgba(26,17,11,.92) 0%,transparent 100%);opacity:0;transition:opacity .55s var(--ease);transform:translateY(6px);transition:opacity .5s,transform .5s var(--ease)}
-  .wi:hover .wi-cap{opacity:1;transform:translateY(0)}
-  .wi-ar{font-family:'Reem Kufi',sans-serif;font-size:.95rem;color:var(--iv)}
-  .wi-en{font-family:'Cormorant Garamond',serif;font-size:.68rem;font-weight:300;letter-spacing:.18em;color:var(--dg);text-transform:uppercase}
+  /* ── Cover Flow Carousel ── */
+  #work{overflow:hidden}
+  .crs-wrap{position:relative;width:100%;height:74vh;min-height:520px;background:var(--dw);perspective:1500px;perspective-origin:50% 46%;overflow:hidden}
+  .crs-wrap::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,var(--dw) 0%,transparent 16%),linear-gradient(to left,var(--dw) 0%,transparent 16%),linear-gradient(to top,var(--dw) 0%,transparent 22%);z-index:15;pointer-events:none}
+  .crs-track{position:relative;width:100%;height:100%}
+  .crs-slide{position:absolute;left:50%;top:50%;height:78%;aspect-ratio:1/1;overflow:hidden;will-change:transform,opacity,filter;transition:transform .9s cubic-bezier(.22,1,.36,1),opacity .8s ease,filter .75s ease;cursor:pointer;-webkit-box-reflect:below -1px linear-gradient(transparent 62%,rgba(0,0,0,.22) 100%)}
+  .crs-slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+  .crs-cap{position:absolute;bottom:0;left:0;right:0;padding:2.5rem 1.4rem 1.1rem;background:linear-gradient(to top,rgba(26,17,11,.88) 0%,transparent 100%);pointer-events:none}
+  .crs-cap-ar{font-family:'Reem Kufi',sans-serif;font-size:.95rem;color:rgba(235,210,170,.95);line-height:1.3;transform:translateY(8px);opacity:0;transition:transform .65s var(--ease),opacity .65s var(--ease);transition-delay:.42s}
+  .crs-slide.active .crs-cap-ar{transform:translateY(0);opacity:1}
+  .crs-btn{position:absolute;top:50%;transform:translateY(-50%);z-index:20;background:rgba(26,17,11,.42);border:1px solid rgba(196,154,92,.22);color:var(--dg);width:50px;height:50px;font-size:1.5rem;line-height:1;display:flex;align-items:center;justify-content:center;transition:background .3s,border-color .3s;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);cursor:pointer}
+  .crs-btn:hover{background:rgba(196,154,92,.16);border-color:rgba(196,154,92,.65)}
+  .crs-prev{right:2rem}
+  .crs-next{left:2rem}
+  .crs-dots{position:absolute;bottom:1.6rem;left:50%;transform:translateX(-50%);display:flex;gap:.55rem;z-index:20}
+  .crs-dot{width:24px;height:2px;background:rgba(196,154,92,.28);transition:background .4s,width .5s var(--ease);border:none;padding:0;cursor:pointer}
+  .crs-dot.active{background:var(--dg);width:46px}
+  /* Lightbox */
+  #gl-lb{position:fixed;inset:0;z-index:9000;background:rgba(14,9,6,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s ease;cursor:zoom-out;padding:2rem}
+  #gl-lb.open{opacity:1;pointer-events:all}
+  #gl-lb-img{max-width:92vw;max-height:84vh;object-fit:contain;display:block}
+  #gl-lb-cap{font-family:'Cormorant Garamond',serif;color:rgba(235,210,170,.6);margin-top:1.2rem;font-size:.9rem;letter-spacing:.08em;text-align:center}
+  @media(max-width:1100px){.crs-wrap{height:66vh;min-height:420px}}
 
   /* =================================================================
      PROCESS
@@ -564,12 +572,13 @@
     .svcp-ar{font-size:1.8rem;}
     .mq-group{gap:3rem; padding-left:3rem;}
     .mq-group img{height:60px;}
-    .work-grid{grid-template-columns:1fr 1fr;grid-auto-rows:180px}
-    .wi-cap{opacity:1;transform:translateY(0);padding:1rem 0.8rem;background:linear-gradient(to top,rgba(26,17,11,1) 0%,rgba(26,17,11,0.5) 100%);}
-    .wi-ar{font-size:0.85rem;}
-    .wi-en{font-size:0.55rem;}
-    .wi:nth-child(n){grid-column:span 1;grid-row:span 1}
-    .wi:nth-child(1),.wi:nth-child(4){grid-column:span 2}
+    .crs-wrap{height:60vw;min-height:320px;perspective:900px}
+    .crs-btn{width:36px;height:36px;font-size:1.15rem}
+    .crs-cap-ar{font-size:.85rem}
+    #work .work-intro{flex-direction:column;align-items:flex-start;gap:.6rem;margin-bottom:1.6rem}
+    #work .work-intro>p{display:none}
+    #work .sh-title{font-size:1.5rem}
+    #work .sh-en{display:none}
     .proc-wrap{flex-direction:column;gap:2.5rem;align-items:center;}
     .proc-line{display:none}
     #hero{padding:6rem 0 3rem;}
@@ -592,8 +601,11 @@
     .sdiv{padding:2.5rem 1.5rem}
   }
   @media(max-width:480px){
-    .work-grid{grid-template-columns:1fr;grid-auto-rows:240px}
-    .wi:nth-child(n){grid-column:span 1;grid-row:span 1}
+    .crs-wrap{height:78vw;min-height:240px;perspective:700px}
+    .crs-slide{height:68%}
+    .crs-btn{display:none}
+    #work .sh-title{font-size:1.25rem}
+    #work .work-intro{margin-bottom:1.2rem}
     .hero-stats{display:none}
   }
   </style>
@@ -666,7 +678,7 @@
         <button class="type-pill" data-type="جلد مُطرَّز">مُطرَّز · Embossed</button>
         <button class="type-pill" data-type="جلد شمواه">شمواه · Suede</button>
         <button class="type-pill" data-type="جلد إيطالي">إيطالي · Italian</button>
-        <button class="type-pill" data-type="جلد صناعي فاخر">فاخر صناعي · Premium PU</button>
+        <button class="type-pill" data-type="جلد طبيعي فاخر">فاخر طبيعي · Premium Natural</button>
       </div>
 
       <!-- COLOR SWATCHES -->
@@ -944,16 +956,20 @@
         كل صورة هنا قصة. كل قطعة كانت فكرة على ورق صارت جلداً يُلمس.
       </p>
     </div>
-    <div class="work-grid">
+  </div>
 
-      <!-- Injected dynamically via portfolio-data.js -->
-    </div>
-    
-    <div style="text-align:center; margin-top:4rem;" class="rev">
+  <div class="crs-wrap">
+    <div class="crs-track" id="crs-track"><!-- injected via JS --></div>
+    <button class="crs-btn crs-prev" id="crs-prev" aria-label="السابق">&#8250;</button>
+    <button class="crs-btn crs-next" id="crs-next" aria-label="التالي">&#8249;</button>
+    <div class="crs-dots" id="crs-dots"></div>
+  </div>
+
+  <div class="w">
+    <div style="text-align:center;margin-top:3rem;" class="rev">
       <a href="portfolio/" class="btn-primary" style="padding:1.1rem 3rem;font-size:1rem;background:transparent;border:1px solid var(--dg);color:var(--dg);box-shadow:none">
         مشاهدة كل الأعمال
       </a>
-
     </div>
   </div>
 </section>
@@ -1418,42 +1434,121 @@ svcOv.addEventListener('click', e => { if (e.target === svcOv) closeSvcPopup(); 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSvcPopup(); });
 
 /* ===================================================================
-   PORTFOLIO HOMEPAGE INJECTION
+   GALLERY LIGHTBOX
+=================================================================== */
+(function(){
+  const lb = document.createElement('div');
+  lb.id = 'gl-lb';
+  lb.innerHTML = '<img id="gl-lb-img" alt=""><p id="gl-lb-cap"></p>';
+  document.body.appendChild(lb);
+  lb.addEventListener('click', () => lb.classList.remove('open'));
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') lb.classList.remove('open'); });
+})();
+window.openGalleryLightbox = (url, cap) => {
+  document.getElementById('gl-lb-img').src = url;
+  document.getElementById('gl-lb-cap').textContent = cap || '';
+  document.getElementById('gl-lb').classList.add('open');
+};
+
+/* ===================================================================
+   GALLERY CAROUSEL — Cover Flow
 =================================================================== */
 document.addEventListener("DOMContentLoaded", async () => {
-  const fwGrid = document.querySelector('.work-grid');
-  if(!fwGrid) return;
-  
+  const track   = document.getElementById('crs-track');
+  const dotsEl  = document.getElementById('crs-dots');
+  const prevBtn = document.getElementById('crs-prev');
+  const nextBtn = document.getElementById('crs-next');
+  if(!track) return;
+
+  let photos = [], cur = 0, timer = null;
+
   try {
-    const res = await fetch('https://whmbrguzumyatnslzfsq.supabase.co/rest/v1/portfolio_projects?select=*&order=created_at.desc&limit=6', {
+    const res = await fetch('https://whmbrguzumyatnslzfsq.supabase.co/rest/v1/gallery_photos?select=id,url,caption_ar&order=sort_order.asc,created_at.desc', {
       headers: {
         'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndobWJyZ3V6dW15YXRuc2x6ZnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzNTE2ODksImV4cCI6MjA2NDkyNzY4OX0.xcSogaAHv8uQzhFgEDZ1niFx8lirLiBRvkPpMF174YM',
         'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndobWJyZ3V6dW15YXRuc2x6ZnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzNTE2ODksImV4cCI6MjA2NDkyNzY4OX0.xcSogaAHv8uQzhFgEDZ1niFx8lirLiBRvkPpMF174YM'
       }
     });
-    
-    if(!res.ok) throw new Error("Failed to fetch from DB");
-    const top6 = await res.json();
-    
-    fwGrid.innerHTML = top6.map(item => `
-      <div class="wi rev" style="cursor:pointer" onclick="window.location.href='portfolio/?project=${item.id}'">
-        <img src="${item.thumb}" alt="${item.title_en}" loading="lazy">
-        <div class="wi-cap">
-          <p class="wi-ar">${item.title_ar}</p>
-          <p class="wi-en">${item.title_en}</p>
-        </div>
-      </div>
-    `).join('');
-    
-      // Attempt to re-observe newly injected items if io exists
-    setTimeout(() => {
-      if(typeof io !== 'undefined') {
-        fwGrid.querySelectorAll('.rev').forEach(el => io.observe(el));
+    if(!res.ok) throw new Error("Failed");
+    photos = await res.json();
+    if(!photos.length) return;
+
+    track.innerHTML = photos.map((p, i) => `
+      <div class="crs-slide"
+           data-url="${p.url.replace(/"/g,'&quot;')}"
+           data-cap="${(p.caption_ar||'').replace(/"/g,'&quot;')}">
+        <img src="${p.url}" alt="${p.caption_ar||''}" loading="${i < 3 ? 'eager' : 'lazy'}">
+        ${p.caption_ar ? `<div class="crs-cap"><p class="crs-cap-ar">${p.caption_ar}</p></div>` : ''}
+      </div>`).join('');
+
+    dotsEl.innerHTML = photos.map((_,i) =>
+      `<button class="crs-dot${i===0?' active':''}" onclick="crsGo(${i})"></button>`
+    ).join('');
+
+    positionSlides();
+    startAuto();
+  } catch(err) { console.error("Carousel error:", err); }
+
+  function positionSlides() {
+    const n = photos.length;
+    track.querySelectorAll('.crs-slide').forEach((slide, i) => {
+      let off = i - cur;
+      if(off > n / 2)  off -= n;
+      if(off < -n / 2) off += n;
+      const abs  = Math.abs(off);
+      const sign = off === 0 ? 0 : off / abs;
+      let tx, ry, sc, op, bl, br, zi;
+      if(abs === 0) {
+        tx = '-50%';                        ry = 0;        sc = 1;    op = 1;    bl = 0;   br = 0.93; zi = 10;
+      } else if(abs === 1) {
+        tx = `calc(-50% + ${sign*58}%)`;    ry = -sign*46; sc = 0.74; op = 0.66; bl = 1.5; br = 0.60; zi = 7;
+      } else if(abs === 2) {
+        tx = `calc(-50% + ${sign*94}%)`;    ry = -sign*60; sc = 0.56; op = 0.36; bl = 4;   br = 0.42; zi = 4;
+      } else {
+        tx = `calc(-50% + ${sign*114}%)`;   ry = -sign*68; sc = 0.44; op = 0;    bl = 8;   br = 0.3;  zi = 1;
       }
-    }, 100);
-  } catch (err) {
-    console.error("Portfolio DB Load Error:", err);
+      slide.style.transform = `translateX(${tx}) translateY(-50%) rotateY(${ry}deg) scale(${sc})`;
+      slide.style.opacity   = op;
+      slide.style.filter    = `blur(${bl}px) brightness(${br})`;
+      slide.style.zIndex    = zi;
+      slide.classList.toggle('active', abs === 0);
+    });
   }
+
+  function crsGo(n) {
+    dotsEl.querySelectorAll('.crs-dot')[cur]?.classList.remove('active');
+    cur = ((n % photos.length) + photos.length) % photos.length;
+    positionSlides();
+    dotsEl.querySelectorAll('.crs-dot')[cur]?.classList.add('active');
+    clearInterval(timer); startAuto();
+  }
+  window.crsGo = crsGo;
+
+  // RTL: right arrow = forward, left arrow = back
+  prevBtn?.addEventListener('click', () => crsGo(cur + 1));
+  nextBtn?.addEventListener('click', () => crsGo(cur - 1));
+
+  // Click: active = lightbox, non-active = navigate to it
+  track.addEventListener('click', e => {
+    const slide = e.target.closest('.crs-slide');
+    if(!slide) return;
+    if(slide.classList.contains('active')) {
+      openGalleryLightbox(slide.dataset.url, slide.dataset.cap);
+    } else {
+      const all = [...track.querySelectorAll('.crs-slide')];
+      crsGo(all.indexOf(slide));
+    }
+  });
+
+  // Touch swipe (RTL: right = forward)
+  let sx = 0;
+  track.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+  track.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - sx;
+    if(Math.abs(dx) > 44) crsGo(dx > 0 ? cur + 1 : cur - 1);
+  });
+
+  function startAuto() { timer = setInterval(() => crsGo(cur + 1), 5000); }
 });
 
 /* ===================================================================
